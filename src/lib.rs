@@ -1,0 +1,124 @@
+#![feature(stdsimd)]
+use core::arch::x86_64::{CpuidResult, __cpuid, __cpuid_count, has_cpuid};
+
+pub mod check;
+
+#[derive(Debug)]
+pub enum CpuidError {
+    NoCPUID,
+    LeafOutOfRange(u32, CpuidFunction),
+}
+
+impl std::fmt::Display for CpuidError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CpuidError::NoCPUID => write!(f, "No CPUID Present on hardware"),
+            CpuidError::LeafOutOfRange(leaf, func) => {
+                write!(f, "Leaf {:#x} not present in function {:?}", leaf, func)
+            }
+        }
+    }
+}
+
+impl std::error::Error for CpuidError {}
+
+fn cpuid(leaf: u32, sub_leaf: u32) -> Result<CpuidResult, CpuidError> {
+    if has_cpuid() {
+        Ok(unsafe { __cpuid_count(leaf, sub_leaf) })
+    } else {
+        Err(CpuidError::NoCPUID)
+    }
+}
+
+const EMPTY_LEAF: CpuidResult = CpuidResult {
+    eax: 0,
+    ebx: 0,
+    ecx: 0,
+    edx: 0,
+};
+
+#[derive(Debug, Clone)]
+pub enum CpuidFunction {
+    Basic,
+    Hypervisor,
+    Extended,
+}
+
+impl CpuidFunction {
+    pub fn start_eax(&self) -> u32 {
+        match self {
+            CpuidFunction::Basic => 0,
+            CpuidFunction::Hypervisor => 0x40000000,
+            CpuidFunction::Extended => 0x80000000,
+        }
+    }
+    pub fn is_valid_leaf(&self, leaf: u32) -> bool {
+        match self {
+            CpuidFunction::Basic => leaf < 0x40000000,
+            CpuidFunction::Hypervisor => leaf >= 0x40000000 && leaf < 0x50000000,
+            CpuidFunction::Extended => leaf >= 0x80000000,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CpuidIterator {
+    leaf: u32,
+    sub_leaf: u32,
+    last: u32,
+    last_sub_leaf: Option<CpuidResult>,
+}
+
+impl CpuidIterator {
+    pub fn new(func: CpuidFunction) -> Result<CpuidIterator, CpuidError> {
+        CpuidIterator::at_leaf(func.start_eax(), func)
+    }
+    pub fn at_leaf(leaf: u32, func: CpuidFunction) -> Result<CpuidIterator, CpuidError> {
+        CpuidIterator::at_sub_leaf(leaf, 0, func)
+    }
+
+    pub fn at_sub_leaf(
+        leaf: u32,
+        sub_leaf: u32,
+        func: CpuidFunction,
+    ) -> Result<CpuidIterator, CpuidError> {
+        let range_info_function = func.start_eax();
+
+        if func.is_valid_leaf(leaf) {
+            Ok(CpuidIterator {
+                leaf,
+                sub_leaf,
+                last: cpuid(range_info_function, 0)?.eax,
+                last_sub_leaf: None,
+            })
+        } else {
+            Err(CpuidError::LeafOutOfRange(leaf, func))
+        }
+    }
+}
+
+impl Iterator for CpuidIterator {
+    type Item = ((u32, u32), CpuidResult);
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if self.leaf > self.last {
+                break None;
+            }
+            let current = cpuid(self.leaf, self.sub_leaf).unwrap();
+            if current == EMPTY_LEAF {
+                self.leaf += 1;
+                self.sub_leaf = 0;
+            } else {
+                if self.last_sub_leaf.take() == Some(current) {
+                    self.leaf += 1;
+                    self.sub_leaf = 0;
+                } else {
+                    let sub_leaf = self.sub_leaf;
+                    self.sub_leaf += 1;
+                    self.last_sub_leaf.replace(current);
+                    break Some(((self.leaf, sub_leaf), current));
+                }
+            }
+        }
+    }
+}
