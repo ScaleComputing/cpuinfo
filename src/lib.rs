@@ -1,5 +1,4 @@
-#![feature(stdsimd)]
-use core::arch::x86_64::{CpuidResult, __cpuid, __cpuid_count, has_cpuid};
+use core::arch::x86_64::{CpuidResult, __cpuid_count};
 
 pub mod check;
 
@@ -22,12 +21,8 @@ impl std::fmt::Display for CpuidError {
 
 impl std::error::Error for CpuidError {}
 
-fn cpuid(leaf: u32, sub_leaf: u32) -> Result<CpuidResult, CpuidError> {
-    if has_cpuid() {
-        Ok(unsafe { __cpuid_count(leaf, sub_leaf) })
-    } else {
-        Err(CpuidError::NoCPUID)
-    }
+fn cpuid(leaf: u32, sub_leaf: u32) -> CpuidResult {
+    unsafe { __cpuid_count(leaf, sub_leaf) }
 }
 
 const EMPTY_LEAF: CpuidResult = CpuidResult {
@@ -88,7 +83,7 @@ impl CpuidIterator {
             Ok(CpuidIterator {
                 leaf,
                 sub_leaf,
-                last: cpuid(range_info_function, 0)?.eax,
+                last: cpuid(range_info_function, 0).eax,
                 last_sub_leaf: None,
             })
         } else {
@@ -104,7 +99,7 @@ impl Iterator for CpuidIterator {
             if self.leaf > self.last {
                 break None;
             }
-            let current = cpuid(self.leaf, self.sub_leaf).unwrap();
+            let current = cpuid(self.leaf, self.sub_leaf);
             if current == EMPTY_LEAF {
                 self.leaf += 1;
                 self.sub_leaf = 0;
