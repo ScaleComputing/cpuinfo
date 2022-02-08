@@ -1,6 +1,6 @@
 use core::arch::x86_64::{CpuidResult, __cpuid_count};
 
-pub mod check;
+pub mod layout;
 
 #[derive(Debug)]
 pub enum CpuidError {
@@ -56,6 +56,12 @@ impl CpuidFunction {
     }
 }
 
+#[derive(Debug, Hash, Clone)]
+pub struct LeafAddr {
+    pub leaf: u32,
+    pub sub_leaf: u32,
+}
+
 #[derive(Debug, Clone)]
 pub struct CpuidIterator {
     leaf: u32,
@@ -92,15 +98,21 @@ impl CpuidIterator {
     }
 }
 
+fn is_empty_leaf(result: &CpuidResult) -> bool {
+    let CpuidResult{ eax, ebx, ecx, edx} = result;
+    // See
+    *eax == 0 && *ebx == 0 && *ecx & 0x0000FF00 == 0
+}
+
 impl Iterator for CpuidIterator {
-    type Item = ((u32, u32), CpuidResult);
+    type Item = (LeafAddr, CpuidResult);
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             if self.leaf > self.last {
                 break None;
             }
             let current = cpuid(self.leaf, self.sub_leaf);
-            if current == EMPTY_LEAF {
+            if is_empty_leaf(&current){
                 self.leaf += 1;
                 self.sub_leaf = 0;
             } else {
@@ -111,7 +123,7 @@ impl Iterator for CpuidIterator {
                     let sub_leaf = self.sub_leaf;
                     self.sub_leaf += 1;
                     self.last_sub_leaf.replace(current);
-                    break Some(((self.leaf, sub_leaf), current));
+                    break Some((LeafAddr{leaf: self.leaf, sub_leaf}, current));
                 }
             }
         }

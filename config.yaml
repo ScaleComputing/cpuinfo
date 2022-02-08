@@ -1,0 +1,24 @@
+0: 
+  name: "Start"
+  data_type:
+    type: Start
+
+0x40000000:
+  name: "Hypervisor ID"
+  data_type:
+    type: String
+
+0x80000002:
+  name: "Brand String 1"
+  data_type:
+    type: String
+
+0x80000003:
+  name: "Brand String 2"
+  data_type:
+    type: String
+
+0x80000004:
+  name: "Brand String 3"
+  data_type:
+    type: String
