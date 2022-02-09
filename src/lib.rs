@@ -25,13 +25,6 @@ fn cpuid(leaf: u32, sub_leaf: u32) -> CpuidResult {
     unsafe { __cpuid_count(leaf, sub_leaf) }
 }
 
-const EMPTY_LEAF: CpuidResult = CpuidResult {
-    eax: 0,
-    ebx: 0,
-    ecx: 0,
-    edx: 0,
-};
-
 #[derive(Debug, Clone)]
 pub enum CpuidFunction {
     Basic,
@@ -50,7 +43,7 @@ impl CpuidFunction {
     pub fn is_valid_leaf(&self, leaf: u32) -> bool {
         match self {
             CpuidFunction::Basic => leaf < 0x40000000,
-            CpuidFunction::Hypervisor => leaf >= 0x40000000 && leaf < 0x50000000,
+            CpuidFunction::Hypervisor => (0x40000000..0x50000000).contains(&leaf),
             CpuidFunction::Extended => leaf >= 0x80000000,
         }
     }
@@ -99,7 +92,12 @@ impl CpuidIterator {
 }
 
 fn is_empty_leaf(result: &CpuidResult) -> bool {
-    let CpuidResult{ eax, ebx, ecx, edx} = result;
+    let CpuidResult {
+        eax,
+        ebx,
+        ecx,
+        edx: _,
+    } = result;
     // See
     *eax == 0 && *ebx == 0 && *ecx & 0x0000FF00 == 0
 }
@@ -112,19 +110,20 @@ impl Iterator for CpuidIterator {
                 break None;
             }
             let current = cpuid(self.leaf, self.sub_leaf);
-            if is_empty_leaf(&current){
+            if is_empty_leaf(&current) || self.last_sub_leaf.take() == Some(current) {
                 self.leaf += 1;
                 self.sub_leaf = 0;
             } else {
-                if self.last_sub_leaf.take() == Some(current) {
-                    self.leaf += 1;
-                    self.sub_leaf = 0;
-                } else {
-                    let sub_leaf = self.sub_leaf;
-                    self.sub_leaf += 1;
-                    self.last_sub_leaf.replace(current);
-                    break Some((LeafAddr{leaf: self.leaf, sub_leaf}, current));
-                }
+                let sub_leaf = self.sub_leaf;
+                self.sub_leaf += 1;
+                self.last_sub_leaf.replace(current);
+                break Some((
+                    LeafAddr {
+                        leaf: self.leaf,
+                        sub_leaf,
+                    },
+                    current,
+                ));
             }
         }
     }

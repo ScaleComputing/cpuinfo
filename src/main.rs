@@ -2,8 +2,8 @@
 // better performance but is not always intuitive behaviour.
 // use std::io::BufWriter;
 
+use cpuid::layout::LeafDesc;
 use cpuid::*;
-use cpuid::layout::{LeafDesc, BoundLeaf};
 use std::collections::BTreeMap;
 use structopt::StructOpt;
 
@@ -12,16 +12,11 @@ use structopt::StructOpt;
 // https://docs.rs/structopt/0.2.10/structopt/index.html#how-to-derivestructopt
 #[derive(StructOpt, Debug)]
 struct Cli {
-    // The pattern we want to look for.
-    pattern: Option<String>,
-    // The path of the file we want to look at.
-    path: Option<String>,
-
     #[structopt(short, long)]
     display_raw: bool,
 }
 
-fn find_read_config() -> Result<BTreeMap<u32, LeafDesc> , Box<dyn std::error::Error>> {
+fn find_read_config() -> Result<BTreeMap<u32, LeafDesc>, Box<dyn std::error::Error>> {
     let file = std::fs::File::open("config.yaml")?;
     Ok(serde_yaml::from_reader(file)?)
 }
@@ -37,7 +32,7 @@ fn display_raw() -> Result<(), Box<dyn std::error::Error>> {
             CpuidIterator::new(CpuidFunction::Extended)
                 .expect("problems with extended cpuid iterator"),
         );
-    for (LeafAddr{leaf, sub_leaf}, result) in iter {
+    for (LeafAddr { leaf, sub_leaf }, result) in iter {
         println!(
             "({:#010x},{:#010x}) {:#010x} {:#010x} {:#010x} {:#010x}",
             leaf, sub_leaf, result.eax, result.ebx, result.ecx, result.edx
@@ -53,7 +48,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     for (leaf, desc) in config {
         if let Some(bound) = desc.bind_leaf(leaf) {
-            println!("{:#010x}: {}",leaf, bound)
+            println!("{:#010x}: {}", leaf, bound)
         }
     }
 

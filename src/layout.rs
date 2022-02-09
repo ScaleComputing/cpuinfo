@@ -1,13 +1,16 @@
-use core::arch::x86_64::CpuidResult;
-use std::fmt;
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
-use std::vec::Vec;
 use super::{cpuid, is_empty_leaf};
+use core::arch::x86_64::CpuidResult;
+use serde::{Deserialize, Serialize};
+use std::fmt;
+use std::vec::Vec;
 
 pub trait DisplayLeaf {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult>;
-    fn display_leaf(&self, leaf: &[CpuidResult], f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error>;
+    fn display_leaf(
+        &self,
+        leaf: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error>;
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,17 +18,31 @@ pub struct StartLeaf {}
 
 impl DisplayLeaf for StartLeaf {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
-        vec![cpuid(leaf,0)]
+        vec![cpuid(leaf, 0)]
     }
-    fn display_leaf(&self, leaf: &[CpuidResult], f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error>
-    {
-        let CpuidResult{eax:max_leaf, ebx, ecx, edx} = leaf[0];
+    fn display_leaf(
+        &self,
+        leaf: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
+        let CpuidResult {
+            eax: max_leaf,
+            ebx,
+            ecx,
+            edx,
+        } = leaf[0];
 
-        let text = String::from_utf8([ebx, edx, ecx].iter().map(|val| val.to_le_bytes()).flatten().collect()).unwrap();
+        let text = String::from_utf8(
+            vec![ebx, edx, ecx]
+                .into_iter()
+                .map(|val| Vec::from(val.to_le_bytes()).into_iter())
+                .flatten()
+                .collect(),
+        )
+        .unwrap();
 
-        write!(f, "'{}' max leaf:{}",text, max_leaf)
+        write!(f, "'{}' max leaf:{}", text, max_leaf)
     }
-
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -33,22 +50,32 @@ pub struct StringLeaf {}
 
 impl DisplayLeaf for StringLeaf {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
-        let cpuid = cpuid(leaf,0);
-        if ! is_empty_leaf(&cpuid) {
+        let cpuid = cpuid(leaf, 0);
+        if !is_empty_leaf(&cpuid) {
             vec![cpuid]
         } else {
             vec![]
         }
     }
-    fn display_leaf(&self, leaf: &[CpuidResult], f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error>
-    {
-        let CpuidResult{eax, ebx, ecx, edx} = leaf[0];
+    fn display_leaf(
+        &self,
+        leaf: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
+        let CpuidResult { eax, ebx, ecx, edx } = leaf[0];
+        let registers = vec![eax, ebx, ecx, edx];
 
-        let text = String::from_utf8([eax, ebx, ecx, edx].iter().map(|val| val.to_le_bytes()).flatten().collect()).unwrap();
+        let text = String::from_utf8(
+            registers
+                .into_iter()
+                .map(|val| Vec::from(val.to_le_bytes()).into_iter())
+                .flatten()
+                .collect(),
+        )
+        .unwrap();
 
-        write!(f, "'{}'",text)
+        write!(f, "'{}'", text)
     }
-
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -65,7 +92,11 @@ impl DisplayLeaf for LeafType {
             LeafType::String(desc) => desc.scan_sub_leaves(leaf),
         }
     }
-    fn display_leaf(&self, leaf: &[CpuidResult], f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+    fn display_leaf(
+        &self,
+        leaf: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
         match self {
             LeafType::Start(desc) => desc.display_leaf(leaf, f),
             LeafType::String(desc) => desc.display_leaf(leaf, f),
@@ -81,7 +112,7 @@ pub struct LeafDesc {
 
 impl LeafDesc {
     pub fn new(name: String, data_type: LeafType) -> LeafDesc {
-        LeafDesc{name, data_type}
+        LeafDesc { name, data_type }
     }
 
     pub fn name(&self) -> &String {
@@ -94,16 +125,16 @@ impl LeafDesc {
 
     pub fn bind_leaf(&self, leaf: u32) -> Option<BoundLeaf> {
         let sub_leaves = self.scan_sub_leaves(leaf);
-        if sub_leaves.len() > 0 {
-            Some(BoundLeaf{ desc: self,
-            sub_leaves,
+        if !sub_leaves.is_empty() {
+            Some(BoundLeaf {
+                desc: self,
+                sub_leaves,
             })
         } else {
             None
         }
     }
 }
-
 
 pub struct BoundLeaf<'a> {
     pub desc: &'a LeafDesc,
@@ -120,9 +151,12 @@ impl DisplayLeaf for LeafDesc {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
         self.data_type.scan_sub_leaves(leaf)
     }
-    fn display_leaf(&self, leaf: &[CpuidResult], f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+    fn display_leaf(
+        &self,
+        leaf: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
         write!(f, "{}: ", self.name)?;
         self.data_type.display_leaf(leaf, f)
     }
 }
-
