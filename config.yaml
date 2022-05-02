@@ -3,10 +3,44 @@
   data_type:
     type: Start
 
+1:
+  name: "Model"
+  data_type:
+    type: BitField
+    eax:
+      - Int:
+          name: stepping
+          bounds:
+            start: 0
+            end: 4
+      - Int:
+          name: model
+          bounds:
+            start: 4
+            end: 8
+      - Int:
+          name: family
+          bounds:
+            start: 8
+            end: 11
+    ebx: []
+    ecx:
+      - Flag:
+          name: SSE3
+          bit: 0
+
+    edx:
+      - Flag:
+          name: fpu
+          bit: 0
+      - Flag:
+          name: vme
+          bit: 0
+
 0x40000000:
   name: "Hypervisor ID"
   data_type:
-    type: String
+    type: Start
 
 0x80000002:
   name: "Brand String 1"

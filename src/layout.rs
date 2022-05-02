@@ -1,4 +1,4 @@
-use super::{cpuid, is_empty_leaf};
+use super::{bitfield, cpuid, is_empty_leaf};
 use core::arch::x86_64::CpuidResult;
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -35,8 +35,7 @@ impl DisplayLeaf for StartLeaf {
         let text = String::from_utf8(
             vec![ebx, edx, ecx]
                 .into_iter()
-                .map(|val| Vec::from(val.to_le_bytes()).into_iter())
-                .flatten()
+                .flat_map(|val| Vec::from(val.to_le_bytes()).into_iter())
                 .collect(),
         )
         .unwrap();
@@ -68,8 +67,7 @@ impl DisplayLeaf for StringLeaf {
         let text = String::from_utf8(
             registers
                 .into_iter()
-                .map(|val| Vec::from(val.to_le_bytes()).into_iter())
-                .flatten()
+                .flat_map(|val| Vec::from(val.to_le_bytes()).into_iter())
                 .collect(),
         )
         .unwrap();
@@ -79,10 +77,63 @@ impl DisplayLeaf for StringLeaf {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct BitFieldLeaf {
+    eax: Vec<bitfield::Field>,
+    ebx: Vec<bitfield::Field>,
+    ecx: Vec<bitfield::Field>,
+    edx: Vec<bitfield::Field>,
+}
+
+impl BitFieldLeaf {
+    fn single_reg(
+        name: &str,
+        reg: u128,
+        fields: &Vec<bitfield::Field>,
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
+        writeln!(f, " {}: {:#8x}", name, reg)?;
+        for field in fields {
+            writeln!(
+                f,
+                "  {}",
+                bitfield::BoundField::from_register_and_field(reg, field)
+            )?
+        }
+        Ok(())
+    }
+}
+
+impl DisplayLeaf for BitFieldLeaf {
+    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
+        let cpuid = cpuid(leaf, 0);
+        if !is_empty_leaf(&cpuid) {
+            vec![cpuid]
+        } else {
+            vec![]
+        }
+    }
+    fn display_leaf(
+        &self,
+        leaf: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
+        let CpuidResult { eax, ebx, ecx, edx } = leaf[0];
+        writeln!(f)?;
+
+        Self::single_reg("eax", eax.into(), &self.eax, f)?;
+        Self::single_reg("ebx", ebx.into(), &self.ebx, f)?;
+        Self::single_reg("ecx", ecx.into(), &self.ecx, f)?;
+        Self::single_reg("edx", edx.into(), &self.edx, f)?;
+        Ok(())
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum LeafType {
     Start(StartLeaf),
     String(StringLeaf),
+    BitField(BitFieldLeaf),
 }
 
 impl DisplayLeaf for LeafType {
@@ -90,6 +141,7 @@ impl DisplayLeaf for LeafType {
         match self {
             LeafType::Start(desc) => desc.scan_sub_leaves(leaf),
             LeafType::String(desc) => desc.scan_sub_leaves(leaf),
+            LeafType::BitField(desc) => desc.scan_sub_leaves(leaf),
         }
     }
     fn display_leaf(
@@ -100,6 +152,7 @@ impl DisplayLeaf for LeafType {
         match self {
             LeafType::Start(desc) => desc.display_leaf(leaf, f),
             LeafType::String(desc) => desc.display_leaf(leaf, f),
+            LeafType::BitField(desc) => desc.display_leaf(leaf, f),
         }
     }
 }
