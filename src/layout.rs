@@ -1,3 +1,5 @@
+//! Provide funcationality to parse and display different cpuid leaf types
+
 use super::{bitfield, cpuid, is_empty_leaf};
 use core::arch::x86_64::CpuidResult;
 use serde::{Deserialize, Serialize};
@@ -13,6 +15,7 @@ pub trait DisplayLeaf {
     ) -> Result<(), fmt::Error>;
 }
 
+///The first leaf found requires special processing
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StartLeaf {}
 
@@ -44,6 +47,7 @@ impl DisplayLeaf for StartLeaf {
     }
 }
 
+/// A leaf that contains a string encoded in 32-bit registers
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StringLeaf {}
 
@@ -76,6 +80,7 @@ impl DisplayLeaf for StringLeaf {
     }
 }
 
+/// A leaf that contains a mix of non 32-bit integers and bit sized flags
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BitFieldLeaf {
     eax: Vec<bitfield::Field>,
