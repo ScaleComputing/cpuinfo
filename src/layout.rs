@@ -133,6 +133,7 @@ impl DisplayLeaf for BitFieldLeaf {
     }
 }
 
+/// Enum to aid in serializing and deserializing leaf information
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum LeafType {
