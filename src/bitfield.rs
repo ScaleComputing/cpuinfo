@@ -101,6 +101,7 @@ impl<'a> fmt::Display for Bound<'a, Int> {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum Field {
     Int(Int),
     Flag(Flag),
