@@ -46,14 +46,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let config = find_read_config()?;
 
-    for (leaf, desc) in config {
-        if let Some(bound) = desc.bind_leaf(leaf) {
-            println!("{:#010x}: {}", leaf, bound)
+    if args.display_raw {
+        display_raw()?;
+    } else {
+        for (leaf, desc) in config {
+            if let Some(bound) = desc.bind_leaf(leaf) {
+                println!("{:#010x}: {}", leaf, bound)
+            }
         }
     }
 
-    if args.display_raw {
-        display_raw()?;
-    }
     Ok(())
 }
