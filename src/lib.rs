@@ -2,6 +2,7 @@ use core::arch::x86_64::{CpuidResult, __cpuid_count};
 
 pub mod bitfield;
 pub mod layout;
+pub mod msr;
 
 #[derive(Debug)]
 pub enum CpuidError {

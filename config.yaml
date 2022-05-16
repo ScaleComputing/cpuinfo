@@ -1,58 +1,70 @@
-0: 
-  name: "Start"
-  data_type:
-    type: Start
+cpuids:
+  0: 
+    name: "Start"
+    data_type:
+      type: Start
 
-1:
-  name: "Model"
-  data_type:
-    type: BitField
-    eax:
-      - type: Int
-        name: stepping
-        bounds:
-          start: 0
-          end: 4
-      - type: Int
-        name: model
-        bounds:
-          start: 4
-          end: 8
-      - type: Int
-        name: family
-        bounds:
-          start: 8
-          end: 11
-    ebx: []
-    ecx:
+  1:
+    name: "Model"
+    data_type:
+      type: BitField
+      eax:
+        - type: Int
+          name: stepping
+          bounds:
+            start: 0
+            end: 4
+        - type: Int
+          name: model
+          bounds:
+            start: 4
+            end: 8
+        - type: Int
+          name: family
+          bounds:
+            start: 8
+            end: 11
+      ebx: []
+      ecx:
+        - type: Flag
+          name: SSE3
+          bit: 0
+
+      edx:
+        - type: Flag
+          name: fpu
+          bit: 0
+        - type: Flag
+          name: vme
+          bit: 0
+
+  0x40000000:
+    name: "Hypervisor ID"
+    data_type:
+      type: Start
+
+  0x80000002:
+    name: "Brand String 1"
+    data_type:
+      type: String
+
+  0x80000003:
+    name: "Brand String 2"
+    data_type:
+      type: String
+
+  0x80000004:
+    name: "Brand String 3"
+    data_type:
+      type: String
+msrs:
+  - name: Arch Capabilities
+    address: 0x10a
+    fields:
       - type: Flag
-        name: SSE3
-        bit: 0
-
-    edx:
+        name: MDS_NO
+        bit: 5
       - type: Flag
-        name: fpu
-        bit: 0
-      - type: Flag
-        name: vme
-        bit: 0
-
-0x40000000:
-  name: "Hypervisor ID"
-  data_type:
-    type: Start
-
-0x80000002:
-  name: "Brand String 1"
-  data_type:
-    type: String
-
-0x80000003:
-  name: "Brand String 2"
-  data_type:
-    type: String
-
-0x80000004:
-  name: "Brand String 3"
-  data_type:
-    type: String
+        name: TAA_NO
+        bit: 8
+      - {type: Flag, name: "TSX_CTRL", bit: 7}

@@ -4,6 +4,8 @@
 
 use cpuid::layout::LeafDesc;
 use cpuid::*;
+use msr::MSRDesc;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use structopt::StructOpt;
 
@@ -16,7 +18,13 @@ struct Cli {
     display_raw: bool,
 }
 
-fn find_read_config() -> Result<BTreeMap<u32, LeafDesc>, Box<dyn std::error::Error>> {
+#[derive(Serialize, Deserialize, Debug)]
+struct Definition {
+    pub cpuids: BTreeMap<u32, LeafDesc>,
+    pub msrs: Vec<MSRDesc>,
+}
+
+fn find_read_config() -> Result<Definition, Box<dyn std::error::Error>> {
     let file = std::fs::File::open("config.yaml")?;
     Ok(serde_yaml::from_reader(file)?)
 }
@@ -49,11 +57,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if args.display_raw {
         display_raw()?;
     } else {
-        for (leaf, desc) in config {
+        println!("CPUID:");
+        for (leaf, desc) in config.cpuids {
             if let Some(bound) = desc.bind_leaf(leaf) {
-                println!("{:#010x}: {}", leaf, bound)
+                println!("{:#010x}: {}", leaf, bound);
             }
         }
+        println!("MSRS:");
+        config.msrs.iter().try_for_each(|msr| {
+            let value = msr.into_value()?;
+            println!("{}", value);
+            Result::<(), Box<dyn std::error::Error>>::Ok(())
+        })?;
     }
 
     Ok(())
