@@ -6,8 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 use std::{
     convert::{self, TryInto},
-    fmt, fs,
-    io::{self, Read, Seek},
+    fmt, io,
 };
 
 /// Wraps a general description of an MSR
@@ -19,15 +18,22 @@ pub struct MSRDesc {
 }
 
 impl MSRDesc {
+    #[cfg(target_os = "linux")]
     pub fn get_value(&self) -> io::Result<u64> {
+        use std::{fs, io::{Read, Seek}};
+
         let mut file = fs::OpenOptions::new().read(true).open("/dev/cpu/0/msr")?;
         file.seek(io::SeekFrom::Start(self.address.into()))?;
         let mut msr_bytes = [u8::MIN; 8];
         file.read_exact(&mut msr_bytes)?;
         Ok(u64::from_le_bytes(msr_bytes))
     }
+    #[cfg(not(target_os = "linux"))]
+    pub fn get_value(&self) -> io::Result<u64> {
+        unimplemented!()
+    }
 
-    pub fn into_value<'a>(&'a self) -> io::Result<MSRValue<'a>> {
+    pub fn into_value(&self) -> io::Result<MSRValue> {
         self.try_into()
     }
 }
