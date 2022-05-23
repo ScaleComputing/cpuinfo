@@ -68,3 +68,54 @@ msrs:
         name: TAA_NO
         bit: 8
       - {type: Flag, name: "TSX_CTRL", bit: 7}
+  - name: Basic VMX
+    address: 0x480
+    fields:
+      - {type: Int, name: "Revision", bounds:{ start: 0, end: 30}}
+      - {type: Int, name: "VMXON size", bounds: { start: 32, end: 44}}
+      - {type: Flag, name: "VMX controls", bit: 55}
+      - {type: Flag, name: "Soft exceptions", bit: 56}
+  - name: "VMX: Pin-based Ctls"
+    address: 0x481
+    fields:
+      - {type: Flag, name: "Ext Int Exit", bit: 32}
+      - {type: Flag, name: "NMI Exits", bit: 35}
+      - {type: Flag, name: "Virt NMI", bit: 37}
+      - {type: Flag, name: "VMX Timer", bit: 38}
+      - {type: Flag, name: "posted Int", bit: 39}
+
+  - name: "VMX: True Pin-based Ctls"
+    address: 0x48D
+    fields:
+      - {type: Flag, name: "Ext Int Exit", bit: 32}
+      - {type: Flag, name: "NMI Exits", bit: 35}
+      - {type: Flag, name: "Virt NMI", bit: 37}
+      - {type: Flag, name: "VMX Timer", bit: 38}
+      - {type: Flag, name: "posted Int", bit: 39}
+
+  - name: "VMX: Proccessor Based Ctls - Most"
+    address: 0x482
+    fields:
+      - {type: Flag, name: "Int Window Exit", bit: 34}
+      - {type: Flag, name: "TSC Offsetting", bit: 35}
+      - {type: Flag, name: "HLT exit", bit: 39}
+      - {type: Flag, name: "INVLPG exit", bit: 41}
+      - {type: Flag, name: "MWAIT exit", bit: 42}
+      - {type: Flag, name: "RDPMC exit", bit: 43}
+      - {type: Flag, name: "RDTSC exit", bit: 44}
+      - {type: Flag, name: "Ctls 3", bit: 49 }
+      - {type: Flag, name: "Ctls 2", bit: 63}
+
+  - name: "VMX: Proccessor Based Ctls - All"
+    address: 0x48E
+    fields: []
+
+  - name: "VMX: Proccessor Based Ctls 2"
+    address: 0x48B
+    fields:
+      - {type: Flag, name: "Virt APIC", bit: 32}
+      - {type: Flag, name: "TSC scaling", bit: 57}
+
+  - name: "VMX: Proccessor Based Ctls 3"
+    address: 0x492
+    fields: []
