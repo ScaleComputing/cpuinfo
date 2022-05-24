@@ -1,7 +1,6 @@
 //! Provide a means to work with and diff sets of facts
 //!
 
-use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 use std::cmp::Eq;
 use std::fmt::{Display, Formatter};
@@ -38,7 +37,6 @@ impl<T: Display> Display for GenericFact<T> {
     }
 }
 
-#[enum_dispatch()]
-pub trait Facter {
-    fn collect_facts<T>(&self) -> Vec<GenericFact<T>>;
+pub trait Facter<T> {
+    fn collect_facts(&self) -> Vec<T>;
 }

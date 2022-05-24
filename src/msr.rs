@@ -1,7 +1,8 @@
 //! Provide Read-Only access to Intel MSRs
 //!
 
-use super::bitfield;
+use super::facts::{self, GenericFact};
+use super::bitfield::{self, Facter};
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 use std::{
@@ -20,7 +21,10 @@ pub struct MSRDesc {
 impl MSRDesc {
     #[cfg(target_os = "linux")]
     pub fn get_value(&self) -> io::Result<u64> {
-        use std::{fs, io::{Read, Seek}};
+        use std::{
+            fs,
+            io::{Read, Seek},
+        };
 
         let mut file = fs::OpenOptions::new().read(true).open("/dev/cpu/0/msr")?;
         file.seek(io::SeekFrom::Start(self.address.into()))?;
@@ -50,6 +54,17 @@ impl<'a> convert::TryFrom<&'a MSRDesc> for MSRValue<'a> {
             desc,
             value: desc.get_value()?,
         })
+    }
+}
+
+impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for MSRValue<'a> {
+    fn collect_facts(&self) -> Vec<GenericFact<T>> {
+        let value = self.value.into();
+        self.desc.fields.iter().map(|field| {
+            let mut fact = bitfield::BoundField::from_register_and_field(value, field).collect_fact();
+            fact.add_path(&self.desc.name);
+            fact
+        }).collect()
     }
 }
 

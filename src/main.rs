@@ -2,20 +2,92 @@
 // better performance but is not always intuitive behaviour.
 // use std::io::BufWriter;
 
+use cpuid::facts::{GenericFact, Facter};
 use cpuid::layout::LeafDesc;
+use cpuid::msr::MSRValue;
 use cpuid::*;
+use enum_dispatch::enum_dispatch;
 use msr::MSRDesc;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use std::convert::TryFrom;
 use structopt::StructOpt;
+
+#[enum_dispatch()]
+trait Command {
+    fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>>;
+}
 
 // Our CLI arguments. (help and version are automatically generated)
 // Documentation on how to use:
 // https://docs.rs/structopt/0.2.10/structopt/index.html#how-to-derivestructopt
-#[derive(StructOpt, Debug)]
-struct Cli {
+#[enum_dispatch(Command)]
+#[derive(StructOpt)]
+enum CommandOpts {
+    Disp(Disp),
+    Facts(Facts),
+}
+
+#[derive(StructOpt)]
+struct Disp {
     #[structopt(short, long)]
     display_raw: bool,
+}
+
+impl Command for Disp {
+    fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
+        if self.display_raw {
+            display_raw()
+        } else {
+            println!("CPUID:");
+            for (leaf, desc) in &config.cpuids {
+                if let Some(bound) = desc.bind_leaf(*leaf) {
+                    println!("{:#010x}: {}", leaf, bound);
+                }
+            }
+            println!("MSRS:");
+            config.msrs.iter().try_for_each(|msr| {
+                let value = msr.into_value()?;
+                println!("{}", value);
+                Result::<(), Box<dyn std::error::Error>>::Ok(())
+            })
+        }
+    }
+}
+
+#[derive(StructOpt)]
+struct Facts {}
+
+fn collect_facts(config: &Definition) -> Result<Vec<GenericFact<serde_yaml::Value>>, Box<dyn std::error::Error>> {
+    let mut ret: Vec<GenericFact<serde_yaml::Value>> = config
+        .cpuids
+        .iter()
+        .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf))
+        .flat_map(|bound| bound.get_facts().into_iter())
+        .map(|mut fact| {
+            fact.add_path("cpuid");
+            fact
+        })
+        .collect();
+
+    for msr in &config.msrs {
+        if let Ok(value) = MSRValue::try_from(msr) {
+            let mut facts = value.collect_facts();
+            for fact in &mut facts {
+                fact.add_path("msr");
+            }
+            ret.append(&mut facts);
+        }
+    }
+
+    Ok(ret)
+}
+
+impl Command for Facts {
+    fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
+        println!("{}", serde_yaml::to_string(&collect_facts(config)?)?);
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,26 +122,9 @@ fn display_raw() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = Cli::from_args();
+    let args = CommandOpts::from_args();
 
     let config = find_read_config()?;
 
-    if args.display_raw {
-        display_raw()?;
-    } else {
-        println!("CPUID:");
-        for (leaf, desc) in config.cpuids {
-            if let Some(bound) = desc.bind_leaf(leaf) {
-                println!("{:#010x}: {}", leaf, bound);
-            }
-        }
-        println!("MSRS:");
-        config.msrs.iter().try_for_each(|msr| {
-            let value = msr.into_value()?;
-            println!("{}", value);
-            Result::<(), Box<dyn std::error::Error>>::Ok(())
-        })?;
-    }
-
-    Ok(())
+    args.run(&config)
 }

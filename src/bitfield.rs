@@ -1,6 +1,7 @@
 //! Provide a means to specify a bit field when working with CPU ID and feature registers
 //!
 
+use super::facts::GenericFact;
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
@@ -17,6 +18,11 @@ pub trait Bindable {
     fn value(&self, reg_val: Register) -> Option<Self::Rep>;
     /// Retreive the name of the bindable
     fn name(&self) -> &String;
+}
+
+#[enum_dispatch()]
+pub trait Facter<T: From<u32> + From<bool>> {
+    fn collect_fact(&self) -> GenericFact<T>;
 }
 
 ///Wraps a bit flag, usually representing if a feature is present or not
@@ -90,6 +96,15 @@ impl<'a> fmt::Display for Bound<'a, Flag> {
     }
 }
 
+impl<'a, T: From<u32> + From<bool>> Facter<T> for Bound<'a, Flag> {
+    fn collect_fact(&self) -> GenericFact<T> {
+        GenericFact::new(
+            self.bits.name.clone(),
+            self.bits.value(self.reg_val).unwrap_or(false).into(),
+        )
+    }
+}
+
 impl<'a> fmt::Display for Bound<'a, Int> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
@@ -97,6 +112,15 @@ impl<'a> fmt::Display for Bound<'a, Int> {
             "{} = {:>10x}",
             self.bits.name,
             self.bits.value(self.reg_val).unwrap_or(0)
+        )
+    }
+}
+
+impl<'a, T: From<u32> + From<bool>> Facter<T> for Bound<'a, Int> {
+    fn collect_fact(&self) -> GenericFact<T> {
+        GenericFact::new(
+            self.bits.name.clone(),
+            self.bits.value(self.reg_val).unwrap_or(0).into(),
         )
     }
 }
@@ -127,6 +151,15 @@ impl<'a> fmt::Display for BoundField<'a> {
         match self {
             Self::Int(bound) => bound.fmt(f),
             Self::Flag(bound) => bound.fmt(f),
+        }
+    }
+}
+
+impl<'a, T: From<bool> + From<u32>> Facter<T> for BoundField<'a> {
+    fn collect_fact(&self) -> GenericFact<T> {
+        match self {
+            Self::Int(bound) => bound.collect_fact(),
+            Self::Flag(bound) => bound.collect_fact(),
         }
     }
 }

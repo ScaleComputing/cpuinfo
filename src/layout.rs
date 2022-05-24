@@ -1,7 +1,10 @@
 //! Provide funcationality to parse and display different cpuid leaf types
 
-use super::facts::GenericFact;
-use super::{bitfield, cpuid, is_empty_leaf};
+use super::facts::{self, GenericFact};
+use super::{
+    bitfield::{self, Facter},
+    cpuid, is_empty_leaf,
+};
 use core::arch::x86_64::CpuidResult;
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
@@ -17,6 +20,10 @@ pub trait DisplayLeaf {
         leaf: &[CpuidResult],
         f: &mut fmt::Formatter<'_>,
     ) -> Result<(), fmt::Error>;
+    fn get_facts<T: From<String> + From<u32> + From<bool>>(
+        &self,
+        leaves: &[CpuidResult],
+    ) -> Vec<GenericFact<T>>;
 }
 
 ///The first leaf found requires special processing
@@ -37,24 +44,6 @@ impl StartLeaf {
             .flat_map(|val| val.to_le_bytes())
             .collect::<Vec<u8>>();
         ToString::to_string(&string::String::from_utf8_lossy(&bytes))
-    }
-
-    pub fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
-    where
-        T: From<u32> + From<String>,
-    {
-        let CpuidResult {
-            eax: max_leaf,
-            ebx: _,
-            ecx: _,
-            edx: _,
-        } = leaves[0];
-        let text = self.get_text(&leaves[0]);
-
-        vec![
-            GenericFact::new("max_leaves".into(), max_leaf.into()),
-            GenericFact::new("type".into(), text.into()),
-        ]
     }
 }
 
@@ -78,6 +67,24 @@ impl DisplayLeaf for StartLeaf {
 
         write!(f, "'{}' max leaf:{}", text, max_leaf)
     }
+
+    fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
+    where
+        T: From<u32> + From<String>,
+    {
+        let CpuidResult {
+            eax: max_leaf,
+            ebx: _,
+            ecx: _,
+            edx: _,
+        } = leaves[0];
+        let text = self.get_text(&leaves[0]);
+
+        vec![
+            GenericFact::new("max_leaves".into(), max_leaf.into()),
+            GenericFact::new("type".into(), text.into()),
+        ]
+    }
 }
 
 /// A leaf that contains a string encoded in 32-bit registers
@@ -94,13 +101,6 @@ impl StringLeaf {
             .collect::<Vec<u8>>();
 
         ToString::to_string(&String::from_utf8_lossy(&text))
-    }
-    pub fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
-    where
-        T: From<String>,
-    {
-        let text = self.get_text(&leaves[0]);
-        vec![GenericFact::new("value".into(), text.into())]
     }
 }
 
@@ -120,6 +120,14 @@ impl DisplayLeaf for StringLeaf {
     ) -> Result<(), fmt::Error> {
         let text = self.get_text(&leaf[0]);
         write!(f, "'{}'", text)
+    }
+
+    fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
+    where
+        T: From<String>,
+    {
+        let text = self.get_text(&leaves[0]);
+        vec![GenericFact::new("value".into(), text.into())]
     }
 }
 
@@ -174,6 +182,26 @@ impl DisplayLeaf for BitFieldLeaf {
         Self::single_reg("edx", edx.into(), &self.edx, f)?;
         Ok(())
     }
+    fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
+    where
+        T: From<bool> + From<u32>,
+    {
+        let CpuidResult { eax, ebx, ecx, edx } = leaves[0];
+        [
+            ("eax", eax, &self.eax),
+            ("ebx", ebx, &self.ebx),
+            ("ecx", ecx, &self.ecx),
+            ("edx", edx, &self.edx),
+        ]
+        .iter()
+        .flat_map(|i| i.2.iter().map(move |j| (i.0, i.1.into(), j)))
+        .map(|q| {
+            let mut fact = bitfield::BoundField::from_register_and_field(q.1, q.2).collect_fact();
+            fact.add_path(q.0);
+            fact
+        })
+        .collect::<Vec<GenericFact<T>>>()
+    }
 }
 
 /// Enum to aid in serializing and deserializing leaf information
@@ -218,17 +246,6 @@ impl LeafDesc {
     }
 }
 
-pub struct BoundLeaf<'a> {
-    pub desc: &'a LeafDesc,
-    pub sub_leaves: Vec<CpuidResult>,
-}
-
-impl<'a> fmt::Display for BoundLeaf<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        self.desc.display_leaf(&self.sub_leaves, f)
-    }
-}
-
 impl DisplayLeaf for LeafDesc {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
         self.data_type.scan_sub_leaves(leaf)
@@ -240,5 +257,38 @@ impl DisplayLeaf for LeafDesc {
     ) -> Result<(), fmt::Error> {
         write!(f, "{}: ", self.name)?;
         self.data_type.display_leaf(leaf, f)
+    }
+    fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
+    where
+        T: From<u32> + From<String> + From<bool>,
+    {
+        self.data_type.get_facts(leaves)
+    }
+}
+
+pub struct BoundLeaf<'a> {
+    pub desc: &'a LeafDesc,
+    pub sub_leaves: Vec<CpuidResult>,
+}
+
+impl<'a> BoundLeaf<'a> {
+    pub fn get_facts<T: From<u32> + From<bool> + From<String>>(&self) -> Vec<GenericFact<T>> {
+        let mut facts = self.desc.get_facts(&self.sub_leaves);
+        facts.iter_mut().for_each(|i| {
+            i.add_path(&self.desc.name);
+        });
+        facts
+    }
+}
+
+impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for BoundLeaf<'a> {
+    fn collect_facts(&self) -> Vec<GenericFact<T>> {
+        self.get_facts()
+    }
+}
+
+impl<'a> fmt::Display for BoundLeaf<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        self.desc.display_leaf(&self.sub_leaves, f)
     }
 }
