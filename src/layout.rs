@@ -3,11 +3,13 @@
 use super::facts::GenericFact;
 use super::{bitfield, cpuid, is_empty_leaf};
 use core::arch::x86_64::CpuidResult;
+use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::string;
 use std::vec::Vec;
 
+#[enum_dispatch]
 pub trait DisplayLeaf {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult>;
     fn display_leaf(
@@ -175,33 +177,13 @@ impl DisplayLeaf for BitFieldLeaf {
 }
 
 /// Enum to aid in serializing and deserializing leaf information
+#[enum_dispatch(DisplayLeaf)]
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum LeafType {
     Start(StartLeaf),
     String(StringLeaf),
     BitField(BitFieldLeaf),
-}
-
-impl DisplayLeaf for LeafType {
-    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
-        match self {
-            LeafType::Start(desc) => desc.scan_sub_leaves(leaf),
-            LeafType::String(desc) => desc.scan_sub_leaves(leaf),
-            LeafType::BitField(desc) => desc.scan_sub_leaves(leaf),
-        }
-    }
-    fn display_leaf(
-        &self,
-        leaf: &[CpuidResult],
-        f: &mut fmt::Formatter<'_>,
-    ) -> Result<(), fmt::Error> {
-        match self {
-            LeafType::Start(desc) => desc.display_leaf(leaf, f),
-            LeafType::String(desc) => desc.display_leaf(leaf, f),
-            LeafType::BitField(desc) => desc.display_leaf(leaf, f),
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

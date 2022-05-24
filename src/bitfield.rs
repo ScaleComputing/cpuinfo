@@ -1,6 +1,7 @@
 //! Provide a means to specify a bit field when working with CPU ID and feature registers
 //!
 
+use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::fmt;
