@@ -1,6 +1,7 @@
 use core::arch::x86_64::{CpuidResult, __cpuid_count};
 
 pub mod bitfield;
+pub mod facts;
 pub mod layout;
 pub mod msr;
 

@@ -1,9 +1,11 @@
 //! Provide funcationality to parse and display different cpuid leaf types
 
+use super::facts::GenericFact;
 use super::{bitfield, cpuid, is_empty_leaf};
 use core::arch::x86_64::CpuidResult;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::string;
 use std::vec::Vec;
 
 pub trait DisplayLeaf {
@@ -19,6 +21,41 @@ pub trait DisplayLeaf {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StartLeaf {}
 
+impl StartLeaf {
+    fn get_text(&self, leaf: &CpuidResult) -> String {
+        let CpuidResult {
+            eax: _,
+            ebx,
+            ecx,
+            edx,
+        } = leaf;
+
+        let bytes = [ebx, edx, ecx]
+            .iter()
+            .flat_map(|val| val.to_le_bytes())
+            .collect::<Vec<u8>>();
+        ToString::to_string(&string::String::from_utf8_lossy(&bytes))
+    }
+
+    pub fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
+    where
+        T: From<u32> + From<String>,
+    {
+        let CpuidResult {
+            eax: max_leaf,
+            ebx: _,
+            ecx: _,
+            edx: _,
+        } = leaves[0];
+        let text = self.get_text(&leaves[0]);
+
+        vec![
+            GenericFact::new("max_leaves".into(), max_leaf.into()),
+            GenericFact::new("type".into(), text.into()),
+        ]
+    }
+}
+
 impl DisplayLeaf for StartLeaf {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
         vec![cpuid(leaf, 0)]
@@ -30,18 +67,12 @@ impl DisplayLeaf for StartLeaf {
     ) -> Result<(), fmt::Error> {
         let CpuidResult {
             eax: max_leaf,
-            ebx,
-            ecx,
-            edx,
+            ebx: _,
+            ecx: _,
+            edx: _,
         } = leaf[0];
 
-        let text = String::from_utf8(
-            vec![ebx, edx, ecx]
-                .into_iter()
-                .flat_map(|val| Vec::from(val.to_le_bytes()).into_iter())
-                .collect(),
-        )
-        .unwrap();
+        let text = self.get_text(&leaf[0]);
 
         write!(f, "'{}' max leaf:{}", text, max_leaf)
     }
@@ -50,6 +81,26 @@ impl DisplayLeaf for StartLeaf {
 /// A leaf that contains a string encoded in 32-bit registers
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StringLeaf {}
+
+impl StringLeaf {
+    pub fn get_text(&self, leaf: &CpuidResult) -> String {
+        let CpuidResult { eax, ebx, ecx, edx } = leaf;
+        let registers = [eax, ebx, ecx, edx];
+        let text = registers
+            .iter()
+            .flat_map(|val| val.to_le_bytes())
+            .collect::<Vec<u8>>();
+
+        ToString::to_string(&String::from_utf8_lossy(&text))
+    }
+    pub fn get_facts<T>(&self, leaves: &[CpuidResult]) -> Vec<GenericFact<T>>
+    where
+        T: From<String>,
+    {
+        let text = self.get_text(&leaves[0]);
+        vec![GenericFact::new("value".into(), text.into())]
+    }
+}
 
 impl DisplayLeaf for StringLeaf {
     fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
@@ -65,17 +116,7 @@ impl DisplayLeaf for StringLeaf {
         leaf: &[CpuidResult],
         f: &mut fmt::Formatter<'_>,
     ) -> Result<(), fmt::Error> {
-        let CpuidResult { eax, ebx, ecx, edx } = leaf[0];
-        let registers = vec![eax, ebx, ecx, edx];
-
-        let text = String::from_utf8(
-            registers
-                .into_iter()
-                .flat_map(|val| Vec::from(val.to_le_bytes()).into_iter())
-                .collect(),
-        )
-        .unwrap();
-
+        let text = self.get_text(&leaf[0]);
         write!(f, "'{}'", text)
     }
 }
