@@ -42,6 +42,16 @@ impl MSRDesc {
     }
 }
 
+impl<'a> fmt::Display for MSRDesc {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}: {:#x}",
+            self.name, self.address
+        )
+    }
+}
+
 pub struct MSRValue<'a> {
     pub desc: &'a MSRDesc,
     pub value: u64,
@@ -72,8 +82,8 @@ impl<'a> fmt::Display for MSRValue<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
-            "{}: {:#x} = {:#x}",
-            self.desc.name, self.desc.address, self.value
+            "{} = {:#x}",
+            self.desc, self.value
         )?;
         for field in &self.desc.fields {
             writeln!(

@@ -46,11 +46,13 @@ impl Command for Disp {
                 }
             }
             println!("MSRS:");
-            config.msrs.iter().try_for_each(|msr| {
-                let value = msr.into_value()?;
-                println!("{}", value);
-                Result::<(), Box<dyn std::error::Error>>::Ok(())
-            })
+            for msr in &config.msrs {
+                match msr.into_value() {
+                    Ok(value) => println!("{}", value),
+                    Err(err) => println!("{} Error : {}", msr, err),
+                }
+            }
+            Ok(())
         }
     }
 }
