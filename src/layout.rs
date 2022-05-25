@@ -39,9 +39,9 @@ impl StartLeaf {
             edx,
         } = leaf;
 
-        let bytes = [ebx, edx, ecx]
-            .iter()
-            .flat_map(|val| val.to_le_bytes())
+        let bytes = vec![*ebx, *edx, *ecx]
+            .into_iter()
+            .flat_map(|val| Vec::from(val.to_le_bytes()).into_iter())
             .collect::<Vec<u8>>();
         ToString::to_string(&string::String::from_utf8_lossy(&bytes))
     }
@@ -94,10 +94,9 @@ pub struct StringLeaf {}
 impl StringLeaf {
     pub fn get_text(&self, leaf: &CpuidResult) -> String {
         let CpuidResult { eax, ebx, ecx, edx } = leaf;
-        let registers = [eax, ebx, ecx, edx];
-        let text = registers
-            .iter()
-            .flat_map(|val| val.to_le_bytes())
+        let text = vec![*eax, *ebx, *ecx, *edx]
+            .into_iter()
+            .flat_map(|val| Vec::from(val.to_le_bytes()).into_iter())
             .collect::<Vec<u8>>();
 
         ToString::to_string(&String::from_utf8_lossy(&text))
