@@ -29,6 +29,9 @@ cpuids:
         - type: Flag
           name: SSE3
           bit: 0
+        - type: Flag
+          name: VMX
+          bit: 5
 
       edx:
         - type: Flag
@@ -41,7 +44,7 @@ cpuids:
   0x40000000:
     name: "Hypervisor ID"
     data_type:
-      type: Start
+      type: String
 
   0x80000002:
     name: "Brand String 1"
