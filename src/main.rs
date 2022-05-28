@@ -2,16 +2,20 @@
 // better performance but is not always intuitive behaviour.
 // use std::io::BufWriter;
 
-use cpuid::facts::{GenericFact, Facter};
+use cpuid::facts::{FactSet, Facter, GenericFact};
 use cpuid::layout::LeafDesc;
 use cpuid::msr::MSRValue;
 use cpuid::*;
 use enum_dispatch::enum_dispatch;
 use msr::MSRDesc;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::convert::TryFrom;
+use std::error::Error;
 use structopt::StructOpt;
+
+type YAMLFact = GenericFact<serde_yaml::Value>;
+type YAMLFactSet = FactSet<serde_yaml::Value>;
 
 #[enum_dispatch()]
 trait Command {
@@ -26,6 +30,7 @@ trait Command {
 enum CommandOpts {
     Disp(Disp),
     Facts(Facts),
+    Diff(Diff),
 }
 
 #[derive(StructOpt)]
@@ -60,8 +65,8 @@ impl Command for Disp {
 #[derive(StructOpt)]
 struct Facts {}
 
-fn collect_facts(config: &Definition) -> Result<Vec<GenericFact<serde_yaml::Value>>, Box<dyn std::error::Error>> {
-    let mut ret: Vec<GenericFact<serde_yaml::Value>> = config
+fn collect_facts(config: &Definition) -> Result<Vec<YAMLFact>, Box<dyn std::error::Error>> {
+    let mut ret: Vec<YAMLFact> = config
         .cpuids
         .iter()
         .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf))
@@ -88,6 +93,44 @@ fn collect_facts(config: &Definition) -> Result<Vec<GenericFact<serde_yaml::Valu
 impl Command for Facts {
     fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
         println!("{}", serde_yaml::to_string(&collect_facts(config)?)?);
+        Ok(())
+    }
+}
+
+fn read_facts_from_file<T: DeserializeOwned>(fname: &str) -> Result<Vec<YAMLFact>, Box<dyn Error>> {
+    let file = std::fs::File::open(fname)?;
+    Ok(serde_yaml::from_reader(file)?)
+}
+
+#[derive(StructOpt)]
+struct Diff {
+    from_file_name: String,
+    to_file_name: String,
+}
+
+#[derive(Serialize, Debug)]
+struct DiffOutput {
+    added: Vec<YAMLFact>,
+    removed: Vec<YAMLFact>,
+    changed: Vec<(YAMLFact, YAMLFact)>,
+}
+
+impl Command for Diff {
+    fn run(&self, _config: &Definition) -> Result<(), Box<dyn Error>> {
+        let from: YAMLFactSet =
+            read_facts_from_file::<serde_yaml::Value>(&self.from_file_name)?.into();
+        let to: YAMLFactSet = read_facts_from_file::<serde_yaml::Value>(&self.to_file_name)?.into();
+
+        let output = DiffOutput {
+            added: from.added_facts(&to).map(Clone::clone).collect(),
+            removed: from.removed_facts(&to).map(Clone::clone).collect(),
+            changed: from
+                .changed_facts(&to)
+                .map(|v| (v.0.clone(), v.1.clone()))
+                .collect(),
+        };
+
+        println!("{}", serde_yaml::to_string(&output)?);
         Ok(())
     }
 }

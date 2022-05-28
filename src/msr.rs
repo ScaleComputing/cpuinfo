@@ -1,8 +1,8 @@
 //! Provide Read-Only access to Intel MSRs
 //!
 
-use super::facts::{self, GenericFact};
 use super::bitfield::{self, Facter};
+use super::facts::{self, GenericFact};
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 use std::{
@@ -44,11 +44,7 @@ impl MSRDesc {
 
 impl<'a> fmt::Display for MSRDesc {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}: {:#x}",
-            self.name, self.address
-        )
+        write!(f, "{}: {:#x}", self.name, self.address)
     }
 }
 
@@ -70,21 +66,22 @@ impl<'a> convert::TryFrom<&'a MSRDesc> for MSRValue<'a> {
 impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for MSRValue<'a> {
     fn collect_facts(&self) -> Vec<GenericFact<T>> {
         let value = self.value.into();
-        self.desc.fields.iter().map(|field| {
-            let mut fact = bitfield::BoundField::from_register_and_field(value, field).collect_fact();
-            fact.add_path(&self.desc.name);
-            fact
-        }).collect()
+        self.desc
+            .fields
+            .iter()
+            .map(|field| {
+                let mut fact =
+                    bitfield::BoundField::from_register_and_field(value, field).collect_fact();
+                fact.add_path(&self.desc.name);
+                fact
+            })
+            .collect()
     }
 }
 
 impl<'a> fmt::Display for MSRValue<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(
-            f,
-            "{} = {:#x}",
-            self.desc, self.value
-        )?;
+        writeln!(f, "{} = {:#x}", self.desc, self.value)?;
         for field in &self.desc.fields {
             writeln!(
                 f,
