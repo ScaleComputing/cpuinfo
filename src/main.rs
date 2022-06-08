@@ -12,6 +12,7 @@ use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::convert::TryFrom;
 use std::error::Error;
+use std::fmt;
 use structopt::StructOpt;
 
 type YAMLFact = GenericFact<serde_yaml::Value>;
@@ -102,17 +103,45 @@ fn read_facts_from_file<T: DeserializeOwned>(fname: &str) -> Result<Vec<YAMLFact
     Ok(serde_yaml::from_reader(file)?)
 }
 
-#[derive(StructOpt)]
-struct Diff {
-    from_file_name: String,
-    to_file_name: String,
-}
-
 #[derive(Serialize, Debug)]
 struct DiffOutput {
     added: Vec<YAMLFact>,
     removed: Vec<YAMLFact>,
     changed: Vec<(YAMLFact, YAMLFact)>,
+}
+
+impl DiffOutput {
+    pub fn is_empty(&self) -> bool {
+        self.added.is_empty() && self.removed.is_empty() && self.changed.is_empty()
+    }
+}
+
+#[derive(Debug)]
+struct DiffFoundError {
+    inner: DiffOutput,
+}
+
+impl DiffFoundError {
+    pub fn new(inner: DiffOutput) -> Self {
+        Self { inner }
+    }
+}
+
+impl fmt::Display for DiffFoundError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let as_yaml = serde_yaml::to_string(&self.inner).map_err(|_| std::fmt::Error {})?;
+        write!(f, "{}", as_yaml)
+    }
+}
+
+impl std::error::Error for DiffFoundError {}
+
+#[derive(StructOpt)]
+struct Diff {
+    from_file_name: String,
+    to_file_name: String,
+    #[structopt(short, long)]
+    verbose: bool,
 }
 
 impl Command for Diff {
@@ -130,8 +159,15 @@ impl Command for Diff {
                 .collect(),
         };
 
-        println!("{}", serde_yaml::to_string(&output)?);
-        Ok(())
+        if output.is_empty() {
+            if self.verbose {
+                println!("{}", serde_yaml::to_string(&output)?);
+            }
+            Ok(())
+        } else {
+            println!("{}", serde_yaml::to_string(&output)?);
+            Err(DiffFoundError::new(output).into())
+        }
     }
 }
 
