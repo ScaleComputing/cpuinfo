@@ -178,8 +178,8 @@ struct Definition {
 }
 
 fn find_read_config() -> Result<Definition, Box<dyn std::error::Error>> {
-    let file = std::fs::File::open("config.yaml")?;
-    Ok(serde_yaml::from_reader(file)?)
+    let file = include_str!("config.yaml");
+    Ok(serde_yaml::from_str(file)?)
 }
 
 fn display_raw() -> Result<(), Box<dyn std::error::Error>> {
