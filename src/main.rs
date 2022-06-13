@@ -51,11 +51,14 @@ impl Command for Disp {
                     println!("{:#010x}: {}", leaf, bound);
                 }
             }
-            println!("MSRS:");
-            for msr in &config.msrs {
-                match msr.into_value() {
-                    Ok(value) => println!("{}", value),
-                    Err(err) => println!("{} Error : {}", msr, err),
+
+            if MSRDesc::is_availible() {
+                println!("MSRS:");
+                for msr in &config.msrs {
+                    match msr.into_value() {
+                        Ok(value) => println!("{}", value),
+                        Err(err) => println!("{} Error : {}", msr, err),
+                    }
                 }
             }
             Ok(())
@@ -78,13 +81,15 @@ fn collect_facts(config: &Definition) -> Result<Vec<YAMLFact>, Box<dyn std::erro
         })
         .collect();
 
-    for msr in &config.msrs {
-        if let Ok(value) = MSRValue::try_from(msr) {
-            let mut facts = value.collect_facts();
-            for fact in &mut facts {
-                fact.add_path("msr");
+    if MSRDesc::is_availible() {
+        for msr in &config.msrs {
+            if let Ok(value) = MSRValue::try_from(msr) {
+                let mut facts = value.collect_facts();
+                for fact in &mut facts {
+                    fact.add_path("msr");
+                }
+                ret.append(&mut facts);
             }
-            ret.append(&mut facts);
         }
     }
 

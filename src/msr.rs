@@ -7,8 +7,37 @@ use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 use std::{
     convert::{self, TryInto},
-    fmt, io,
+    error, fmt, io,
 };
+
+#[derive(Debug)]
+pub enum Error {
+    NotAvailible,
+    IOError(io::Error),
+}
+
+pub type Result<V> = std::result::Result<V, Error>;
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::NotAvailible => write!(f, "MSR Feature not availible"),
+            Error::IOError(e) => write!(f, "IOError: {}", e),
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        None
+    }
+}
+
+impl convert::From<io::Error> for Error {
+    fn from(e: io::Error) -> Self {
+        Error::IOError(e)
+    }
+}
 
 /// Wraps a general description of an MSR
 #[derive(Serialize, Deserialize, Debug)]
@@ -19,25 +48,41 @@ pub struct MSRDesc {
 }
 
 impl MSRDesc {
-    #[cfg(target_os = "linux")]
-    pub fn get_value(&self) -> io::Result<u64> {
+    #[cfg(all(target_os = "linux", feature = "use_msr"))]
+    pub fn get_value(&self) -> Result<u64> {
         use std::{
             fs,
             io::{Read, Seek},
         };
 
-        let mut file = fs::OpenOptions::new().read(true).open("/dev/cpu/0/msr")?;
+        let mut file = fs::OpenOptions::new()
+            .read(true)
+            .open("/dev/cpu/0/msr")
+            .map_err(|e| match e.kind() {
+                io::ErrorKind::NotFound => Error::NotAvailible,
+                io::ErrorKind::PermissionDenied => Error::NotAvailible,
+                _ => Error::IOError(e),
+            })?;
         file.seek(io::SeekFrom::Start(self.address.into()))?;
         let mut msr_bytes = [u8::MIN; 8];
         file.read_exact(&mut msr_bytes)?;
         Ok(u64::from_le_bytes(msr_bytes))
     }
-    #[cfg(not(target_os = "linux"))]
-    pub fn get_value(&self) -> io::Result<u64> {
-        unimplemented!()
+    #[cfg(all(target_os = "linux", feature = "use_msr"))]
+    pub fn is_availible() -> bool {
+        true
     }
 
-    pub fn into_value(&self) -> io::Result<MSRValue> {
+    #[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
+    pub fn get_value(&self) -> Result<u64> {
+        Err(Error::NotAvailible)
+    }
+    #[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
+    pub fn is_availible() -> bool {
+        false
+    }
+
+    pub fn into_value(&self) -> Result<MSRValue> {
         self.try_into()
     }
 }
@@ -54,8 +99,8 @@ pub struct MSRValue<'a> {
 }
 
 impl<'a> convert::TryFrom<&'a MSRDesc> for MSRValue<'a> {
-    type Error = io::Error;
-    fn try_from(desc: &'a MSRDesc) -> io::Result<MSRValue<'a>> {
+    type Error = Error;
+    fn try_from(desc: &'a MSRDesc) -> Result<MSRValue<'a>> {
         Ok(MSRValue {
             desc,
             value: desc.get_value()?,
