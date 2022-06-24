@@ -64,6 +64,8 @@ msrs:
   - name: Arch Capabilities
     address: 0x10a
     fields:
+      - {type: Flag, name: "Rogue Data Cache Load", bit: 0}
+      - {type: Flag, name: "Enhanced IBRS", bit: 1}
       - type: Flag
         name: MDS_NO
         bit: 5
