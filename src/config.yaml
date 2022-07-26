@@ -32,6 +32,7 @@ cpuids:
         - type: Flag
           name: VMX
           bit: 5
+        - {type: Flag, name: AESNI, bit: 25}
 
       edx:
         - type: Flag
