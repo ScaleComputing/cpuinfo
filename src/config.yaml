@@ -44,7 +44,74 @@ cpuids:
   0x40000000:
     name: "Hypervisor ID"
     data_type:
+      type: Start
+  
+  0x40000001:
+    name: "Hypervisor Vendor-Neutral ID"
+    data_type:
       type: String
+
+  0x40000002:
+    name: "Hypervisor System ID"
+    data_type:
+      type: BitField
+      eax: 
+        - {type: Int, name: "Build Number", bounds: {start: 0, end: 31}}
+      ebx: 
+        - {type: Int, name: "Major", bounds: {start: 16, end: 31}}
+        - {type: Int, name: "Minor", bounds: {start: 0, end: 15}}
+      ecx: []
+      edx: []
+
+  0x40000003:
+    name: "Hypervisor Feature ID"
+    data_type:
+      type: BitField
+      eax: 
+        - {type: Int, name: "Privilege Mask Low", bounds: {start: 0, end: 31}}
+      ebx: 
+        - {type: Int, name: "Privilege Mask High", bounds: {start: 0, end: 31}}
+      ecx: 
+        - {type: Flag, name: Mperf, bit: 5}
+        - {type: Flag, name: "Shadow Stack", bit: 6}
+        - {type: Flag, name: PMU, bit: 7}
+        - {type: Flag, name: "Trap Intercept", bit: 8}
+      edx:
+        - {type: Flag, name: MWAIT(Depricated), bit: 0}
+        - {type: Flag, name: Debug, bit: 1}
+        - {type: Flag, name: PerfMon, bit: 2}
+        - {type: Flag, name: "Physical partition events", bit: 3}
+        - {type: Flag, name: Hypercall XMM, bit: 4}
+        - {type: Flag, name: Guest Idle, bit: 5}
+        - {type: Flag, name: Hypervisor sleep, bit: 6}
+        - {type: Flag, name: NUMA, bit: 7}
+        - {type: Flag, name: Timer Freq., bit: 8}
+        - {type: Flag, name: MCEInject, bit: 9}
+        - {type: Flag, name: Crash MSR, bit: 10}
+        - {type: Flag, name: Debug MSR, bit: 11}
+        - {type: Flag, name: NPIEP, bit: 12}
+        - {type: Flag, name: DisableHypervisorAvailable, bit: 13}
+        - {type: Flag, name: ExtendedGvaRangesForFlushVirtualAddressListAvailable, bit: 14}
+        - {type: Flag, name: Hypercall XMM Return, bit: 15}
+        - {type: Flag, name: SintPollingModeAvailable, bit: 17}
+        - {type: Flag, name: HypercallMsrLockAvailable, bit: 18}
+        - {type: Flag, name: Direct Synthetic Timers, bit: 19}
+        - {type: Flag, name: PAT VSM, bit: 20}
+        - {type: Flag, name: bindcfgs VSM, bit: 21}
+        - {type: Flag, name: Unhalted Timer, bit: 23}
+        - {type: Flag, name: LBR, bit: 26}
+
+  0x40000005:
+    name: "Hypervisor Feature ID"
+    data_type:
+      type: BitField
+      eax: 
+        - {type: Int, name: "Max Virtual Porcessors", bounds: {start: 0, end: 31}}
+      ebx: 
+        - {type: Int, name: "Max Logical Porcessors", bounds: {start: 0, end: 31}}
+      ecx:
+        - {type: Int, name: "Max Pysical Interrupt Vectors", bounds: {start: 0, end: 31}}
+      edx: []
 
   0x80000002:
     name: "Brand String 1"
