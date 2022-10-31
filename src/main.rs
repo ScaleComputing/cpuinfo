@@ -2,10 +2,10 @@
 // better performance but is not always intuitive behaviour.
 // use std::io::BufWriter;
 
-use cpuid::facts::{FactSet, Facter, GenericFact};
-use cpuid::layout::LeafDesc;
-use cpuid::msr::MSRValue;
-use cpuid::*;
+use cpuinfo::facts::{FactSet, Facter, GenericFact};
+use cpuinfo::layout::LeafDesc;
+use cpuinfo::msr::MSRValue;
+use cpuinfo::*;
 use enum_dispatch::enum_dispatch;
 use msr::MSRDesc;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};

@@ -1,5 +1,5 @@
 [package]
-name = "cpuid"
+name = "cpuinfo"
 description = "A utility to identify a cpu and features present. It uses the 'CPUID' instruction and on platforms that support it, feature MSRs."
 version = "0.1.0"
 authors = ["Joshua Job <jjob@scalecomputing.com>"]

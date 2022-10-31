@@ -40,8 +40,8 @@ Cargo will also run it. If you didn't build it, it will also do that.
 
 Cargo will place the executable depending on if it was built as a release or debug build.
 
-`./target/debug/cpuid --help`
-`./target/release/cpuid --help`
+`./target/debug/cpuinfo --help`
+`./target/release/cpuinfo --help`
 
 ## What about CI?
 
