@@ -168,7 +168,7 @@ msrs:
 
   - name: "VMX: Proccessor Based Ctls - Most"
     address: 0x482
-    fields:
+    fields: 
       - {type: Flag, name: "Int Window Exit", bit: 34}
       - {type: Flag, name: "TSC Offsetting", bit: 35}
       - {type: Flag, name: "HLT exit", bit: 39}
@@ -176,19 +176,84 @@ msrs:
       - {type: Flag, name: "MWAIT exit", bit: 42}
       - {type: Flag, name: "RDPMC exit", bit: 43}
       - {type: Flag, name: "RDTSC exit", bit: 44}
+      - {type: Flag, name: "CR3-load exit", bit: 47}
+      - {type: Flag, name: "CR3-store exit", bit: 48}
       - {type: Flag, name: "Ctls 3", bit: 49 }
+      - {type: Flag, name: "CR8-load exit", bit: 51}
+      - {type: Flag, name: "CR8-store exit", bit: 52}
+      - {type: Flag, name: "TPR Shadow", bit: 53}
+      - {type: Flag, name: "NMI exit", bit: 54}
+      - {type: Flag, name: "MOV-DR exit", bit: 55}
+      - {type: Flag, name: "IO exit-all", bit: 56}
+      - {type: Flag, name: "IO bitmap", bit: 57}
+      - {type: Flag, name: "Monitor Trap", bit: 59}
+      - {type: Flag, name: "MSR bitmap", bit: 60}
+      - {type: Flag, name: "MONITOR exit", bit: 61}
+      - {type: Flag, name: "PAUSE exit", bit: 62}
       - {type: Flag, name: "Ctls 2", bit: 63}
 
   - name: "VMX: Proccessor Based Ctls - All"
     address: 0x48E
-    fields: []
+    fields: 
+      - {type: Flag, name: "Int Window Exit", bit: 34}
+      - {type: Flag, name: "TSC Offsetting", bit: 35}
+      - {type: Flag, name: "HLT exit", bit: 39}
+      - {type: Flag, name: "INVLPG exit", bit: 41}
+      - {type: Flag, name: "MWAIT exit", bit: 42}
+      - {type: Flag, name: "RDPMC exit", bit: 43}
+      - {type: Flag, name: "RDTSC exit", bit: 44}
+      - {type: Flag, name: "CR3-load exit", bit: 47}
+      - {type: Flag, name: "CR3-store exit", bit: 48}
+      - {type: Flag, name: "Ctls 3", bit: 49 }
+      - {type: Flag, name: "CR8-load exit", bit: 51}
+      - {type: Flag, name: "CR8-store exit", bit: 52}
+      - {type: Flag, name: "TPR Shadow", bit: 53}
+      - {type: Flag, name: "NMI exit", bit: 54}
+      - {type: Flag, name: "MOV-DR exit", bit: 55}
+      - {type: Flag, name: "IO exit-all", bit: 56}
+      - {type: Flag, name: "IO bitmap", bit: 57}
+      - {type: Flag, name: "Monitor Trap", bit: 59}
+      - {type: Flag, name: "MSR bitmap", bit: 60}
+      - {type: Flag, name: "MONITOR exit", bit: 61}
+      - {type: Flag, name: "PAUSE exit", bit: 62}
+      - {type: Flag, name: "Ctls 2", bit: 63}
 
   - name: "VMX: Proccessor Based Ctls 2"
     address: 0x48B
     fields:
       - {type: Flag, name: "Virt APIC", bit: 32}
+      - {type: Flag, name: "Enable EPT", bit: 33}
+      - {type: Flag, name: "Descriptor Table exit", bit: 34}
+      - {type: Flag, name: "Enable RDTSCP", bit: 35}
+      - {type: Flag, name: "Virt x2APIC", bit: 36}
+      - {type: Flag, name: "Enable VPID", bit: 37}
+      - {type: Flag, name: "WBINVD exit", bit: 38}
+      - {type: Flag, name: "unrestricted", bit: 39}
+      - {type: Flag, name: "Virt Apic", bit: 40}
+      - {type: Flag, name: "Virt Interrupts", bit: 41}
+      - {type: Flag, name: "PAUSE loop exit", bit: 42}
+      - {type: Flag, name: "RDRAND exit", bit: 43}
+      - {type: Flag, name: "Enable INVPCID", bit: 44}
+      - {type: Flag, name: "Enable VMFUNC", bit: 45}
+      - {type: Flag, name: "VMCS shadow", bit: 46}
+      - {type: Flag, name: "ENCLS exit", bit: 47}
+      - {type: Flag, name: "RDSEED exit", bit: 48}
+      - {type: Flag, name: "Enable PML", bit: 49}
+      - {type: Flag, name: "EPT exceptions", bit: 50}
+      - {type: Flag, name: "VMX-PT conceal", bit: 51}
+      - {type: Flag, name: "Enable XSAVE", bit: 52}
+      - {type: Flag, name: "Mode EPT Ctrl", bit: 54}
+      - {type: Flag, name: "EPT Write Perm size", bit: 55}
+      - {type: Flag, name: "PT - Guest Addr", bit: 56}
       - {type: Flag, name: "TSC scaling", bit: 57}
+      - {type: Flag, name: "User Wait", bit: 58}
+      - {type: Flag, name: "Enable Pconfig", bit: 59}
+      - {type: Flag, name: "ENCLV Exit", bit: 60}
 
   - name: "VMX: Proccessor Based Ctls 3"
     address: 0x492
-    fields: []
+    fields:
+      - {type: Flag, name: "LOADIWKEY", bit: 0}
+      - {type: Flag, name: "Enable HLAT", bit: 1}
+      - {type: Flag, name: "EPT Write Ctrl", bit: 2}
+      - {type: Flag, name: "Guest Page Verify", bit: 3}
