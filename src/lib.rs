@@ -24,7 +24,7 @@ impl std::fmt::Display for CpuidError {
 
 impl std::error::Error for CpuidError {}
 
-fn cpuid(leaf: u32, sub_leaf: u32) -> CpuidResult {
+pub fn cpuid(leaf: u32, sub_leaf: u32) -> CpuidResult {
     unsafe { __cpuid_count(leaf, sub_leaf) }
 }
 
