@@ -47,8 +47,54 @@ impl Command for Disp {
         } else {
             println!("CPUID:");
             for (leaf, desc) in &config.cpuids {
-                if let Some(bound) = desc.bind_leaf(*leaf) {
+                if let Some(bound) = desc.bind_leaf(*leaf, cpuid) {
                     println!("{:#010x}: {}", leaf, bound);
+                }
+            }
+
+            #[cfg(all(target_os = "linux", feature = "kvm"))]
+            {
+                use kvm_bindings::{KVM_CPUID_FLAG_SIGNIFCANT_INDEX, KVM_MAX_CPUID_ENTRIES};
+                use kvm_ioctls::Kvm;
+                println!("KVM-CPUID:");
+                let kvm = Kvm::new().expect("Unable to open KVM");
+                let cpuid_fam = kvm
+                    .get_supported_cpuid(KVM_MAX_CPUID_ENTRIES)
+                    .expect("Unable to retreive cpuid entries");
+                let cpuid_entries = cpuid_fam.as_slice();
+                for (leaf, desc) in &config.cpuids {
+                    use core::arch::x86_64::CpuidResult;
+                    if let Some(bound) = desc.bind_leaf(*leaf, |leaf, subleaf| {
+                        cpuid_entries
+                            .iter()
+                            .find_map(|entry| {
+                                if entry.function == leaf {
+                                    if (subleaf == 0
+                                        && (entry.flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) == 0)
+                                        || (subleaf == entry.index)
+                                    {
+                                        Some(CpuidResult {
+                                            eax: entry.eax,
+                                            ebx: entry.ebx,
+                                            ecx: entry.ecx,
+                                            edx: entry.edx,
+                                        })
+                                    } else {
+                                        None
+                                    }
+                                } else {
+                                    None
+                                }
+                            })
+                            .unwrap_or(CpuidResult {
+                                eax: 0,
+                                ebx: 0,
+                                ecx: 0,
+                                edx: 0,
+                            })
+                    }) {
+                        println!("{:#010x}: {}", leaf, bound);
+                    }
                 }
             }
 
@@ -73,7 +119,7 @@ fn collect_facts(config: &Definition) -> Result<Vec<YAMLFact>, Box<dyn std::erro
     let mut ret: Vec<YAMLFact> = config
         .cpuids
         .iter()
-        .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf))
+        .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf, cpuid))
         .flat_map(|bound| bound.get_facts().into_iter())
         .map(|mut fact| {
             fact.add_path("cpuid");
