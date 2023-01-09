@@ -3,18 +3,23 @@
 use super::facts::{self, GenericFact};
 use super::{
     bitfield::{self, Facter},
-    cpuid, is_empty_leaf,
+    is_empty_leaf,
 };
 use core::arch::x86_64::CpuidResult;
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::ops::Fn;
 use std::string;
 use std::vec::Vec;
 
 #[enum_dispatch]
 pub trait DisplayLeaf {
-    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult>;
+    fn scan_sub_leaves<CPUIDFunc: Fn(u32, u32) -> CpuidResult>(
+        &self,
+        leaf: u32,
+        cpuid: CPUIDFunc,
+    ) -> Vec<CpuidResult>;
     fn display_leaf(
         &self,
         leaf: &[CpuidResult],
@@ -48,7 +53,11 @@ impl StartLeaf {
 }
 
 impl DisplayLeaf for StartLeaf {
-    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
+    fn scan_sub_leaves<CPUIDFunc: Fn(u32, u32) -> CpuidResult>(
+        &self,
+        leaf: u32,
+        cpuid: CPUIDFunc,
+    ) -> Vec<CpuidResult> {
         vec![cpuid(leaf, 0)]
     }
     fn display_leaf(
@@ -104,7 +113,11 @@ impl StringLeaf {
 }
 
 impl DisplayLeaf for StringLeaf {
-    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
+    fn scan_sub_leaves<CPUIDFunc: Fn(u32, u32) -> CpuidResult>(
+        &self,
+        leaf: u32,
+        cpuid: CPUIDFunc,
+    ) -> Vec<CpuidResult> {
         let cpuid = cpuid(leaf, 0);
         if !is_empty_leaf(&cpuid) {
             vec![cpuid]
@@ -159,7 +172,11 @@ impl BitFieldLeaf {
 }
 
 impl DisplayLeaf for BitFieldLeaf {
-    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
+    fn scan_sub_leaves<CPUIDFunc: Fn(u32, u32) -> CpuidResult>(
+        &self,
+        leaf: u32,
+        cpuid: CPUIDFunc,
+    ) -> Vec<CpuidResult> {
         let cpuid = cpuid(leaf, 0);
         if !is_empty_leaf(&cpuid) {
             vec![cpuid]
@@ -232,8 +249,12 @@ impl LeafDesc {
         &self.data_type
     }
 
-    pub fn bind_leaf(&self, leaf: u32) -> Option<BoundLeaf> {
-        let sub_leaves = self.scan_sub_leaves(leaf);
+    pub fn bind_leaf<CPUIDFunc: Fn(u32, u32) -> CpuidResult>(
+        &self,
+        leaf: u32,
+        cpuid: CPUIDFunc,
+    ) -> Option<BoundLeaf> {
+        let sub_leaves = self.scan_sub_leaves(leaf, cpuid);
         if !sub_leaves.is_empty() {
             Some(BoundLeaf {
                 desc: self,
@@ -246,8 +267,12 @@ impl LeafDesc {
 }
 
 impl DisplayLeaf for LeafDesc {
-    fn scan_sub_leaves(&self, leaf: u32) -> Vec<CpuidResult> {
-        self.data_type.scan_sub_leaves(leaf)
+    fn scan_sub_leaves<CPUIDFunc: Fn(u32, u32) -> CpuidResult>(
+        &self,
+        leaf: u32,
+        cpuid: CPUIDFunc,
+    ) -> Vec<CpuidResult> {
+        self.data_type.scan_sub_leaves(leaf, cpuid)
     }
     fn display_leaf(
         &self,
