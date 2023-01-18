@@ -47,54 +47,27 @@ impl Command for Disp {
         } else {
             println!("CPUID:");
             for (leaf, desc) in &config.cpuids {
-                if let Some(bound) = desc.bind_leaf(*leaf, cpuid) {
+                if let Some(bound) = desc.bind_leaf(*leaf, &cpuid) {
                     println!("{:#010x}: {}", leaf, bound);
                 }
             }
 
             #[cfg(all(target_os = "linux", feature = "kvm"))]
             {
-                use kvm_bindings::{KVM_CPUID_FLAG_SIGNIFCANT_INDEX, KVM_MAX_CPUID_ENTRIES};
+                use cpuinfo::kvm::KvmInfo;
                 use kvm_ioctls::Kvm;
                 println!("KVM-CPUID:");
-                let kvm = Kvm::new().expect("Unable to open KVM");
-                let cpuid_fam = kvm
-                    .get_supported_cpuid(KVM_MAX_CPUID_ENTRIES)
-                    .expect("Unable to retreive cpuid entries");
-                let cpuid_entries = cpuid_fam.as_slice();
-                for (leaf, desc) in &config.cpuids {
-                    use core::arch::x86_64::CpuidResult;
-                    if let Some(bound) = desc.bind_leaf(*leaf, |leaf, subleaf| {
-                        cpuid_entries
-                            .iter()
-                            .find_map(|entry| {
-                                if entry.function == leaf {
-                                    if (subleaf == 0
-                                        && (entry.flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) == 0)
-                                        || (subleaf == entry.index)
-                                    {
-                                        Some(CpuidResult {
-                                            eax: entry.eax,
-                                            ebx: entry.ebx,
-                                            ecx: entry.ecx,
-                                            edx: entry.edx,
-                                        })
-                                    } else {
-                                        None
-                                    }
-                                } else {
-                                    None
-                                }
-                            })
-                            .unwrap_or(CpuidResult {
-                                eax: 0,
-                                ebx: 0,
-                                ecx: 0,
-                                edx: 0,
-                            })
-                    }) {
-                        println!("{:#010x}: {}", leaf, bound);
+                if let Err(e) = {
+                    let kvm = Kvm::new()?;
+                    let kvm_info = KvmInfo::new(&kvm)?;
+                    for (leaf, desc) in &config.cpuids {
+                        if let Some(bound) = desc.bind_leaf(*leaf, &kvm_info) {
+                            println!("{:#010x}: {}", leaf, bound);
+                        }
                     }
+                    Ok::<(), kvm_ioctls::Error>(())
+                } {
+                    println!("Error Processing KVM-CPUID: {}", e);
                 }
             }
 
@@ -113,13 +86,20 @@ impl Command for Disp {
 }
 
 #[derive(StructOpt)]
-struct Facts {}
+struct Facts {
+    #[cfg(all(target_os = "linux", feature = "kvm"))]
+    #[structopt(short, long)]
+    use_kvm: bool,
+}
 
-fn collect_facts(config: &Definition) -> Result<Vec<YAMLFact>, Box<dyn std::error::Error>> {
+fn collect_facts(
+    config: &Definition,
+    cpuid_selected: CpuidType,
+) -> Result<Vec<YAMLFact>, Box<dyn std::error::Error>> {
     let mut ret: Vec<YAMLFact> = config
         .cpuids
         .iter()
-        .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf, cpuid))
+        .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf, &cpuid_selected))
         .flat_map(|bound| bound.get_facts().into_iter())
         .map(|mut fact| {
             fact.add_path("cpuid");
@@ -127,7 +107,13 @@ fn collect_facts(config: &Definition) -> Result<Vec<YAMLFact>, Box<dyn std::erro
         })
         .collect();
 
-    if MSRDesc::is_availible() {
+    let use_kvm = match cpuid_selected {
+        CpuidType::Func(_) => false,
+        #[cfg(all(target_os = "linux", feature = "kvm"))]
+        CpuidType::KvmInfo(_) => true,
+    };
+
+    if MSRDesc::is_availible() && !use_kvm {
         for msr in &config.msrs {
             if let Ok(value) = MSRValue::try_from(msr) {
                 let mut facts = value.collect_facts();
@@ -144,7 +130,37 @@ fn collect_facts(config: &Definition) -> Result<Vec<YAMLFact>, Box<dyn std::erro
 
 impl Command for Facts {
     fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
-        println!("{}", serde_yaml::to_string(&collect_facts(config)?)?);
+        #[cfg(all(target_os = "linux", feature = "kvm"))]
+        let kvm_option = {
+            use cpuinfo::kvm::KvmInfo;
+            use kvm_ioctls::Kvm;
+            if self.use_kvm {
+                println!("using kvm");
+                let kvm = Kvm::new()?;
+                Some(KvmInfo::new(&kvm)?)
+            } else {
+                None
+            }
+        };
+
+        let cpuid_source = {
+            #[cfg(all(target_os = "linux", feature = "kvm"))]
+            {
+                if let Some(kvm_info) = kvm_option {
+                    kvm_info.into()
+                } else {
+                    CpuidType::func()
+                }
+            }
+            #[cfg(any(not(target_os = "linux"), not(feature = "kvm")))]
+            {
+                CpuidType::func()
+            }
+        };
+        println!(
+            "{}",
+            serde_yaml::to_string(&collect_facts(config, cpuid_source)?)?
+        );
         Ok(())
     }
 }
