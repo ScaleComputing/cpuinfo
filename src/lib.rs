@@ -1,9 +1,18 @@
 use core::arch::x86_64::{CpuidResult, __cpuid_count};
+use enum_dispatch::enum_dispatch;
 
 pub mod bitfield;
 pub mod facts;
 pub mod layout;
 pub mod msr;
+
+#[cfg(all(target_os = "linux", feature = "kvm"))]
+pub mod kvm;
+
+#[enum_dispatch]
+pub trait CpuidDB {
+    fn get_cpuid(&self, leaf: u32, sub_leaf: u32) -> CpuidResult;
+}
 
 #[derive(Debug)]
 pub enum CpuidError {
@@ -26,6 +35,25 @@ impl std::error::Error for CpuidError {}
 
 pub fn cpuid(leaf: u32, sub_leaf: u32) -> CpuidResult {
     unsafe { __cpuid_count(leaf, sub_leaf) }
+}
+
+impl<T: Fn(u32, u32) -> CpuidResult> CpuidDB for T {
+    fn get_cpuid(&self, leaf: u32, sub_leaf: u32) -> CpuidResult {
+        self(leaf, sub_leaf)
+    }
+}
+
+#[enum_dispatch(CpuidDB)]
+pub enum CpuidType<'a> {
+    Func(&'a dyn Fn(u32, u32) -> CpuidResult),
+    #[cfg(all(target_os = "linux", feature = "kvm"))]
+    KvmInfo(kvm::KvmInfo),
+}
+
+impl<'a> CpuidType<'a> {
+    pub fn func() -> Self {
+        Self::Func(&cpuid)
+    }
 }
 
 #[derive(Debug, Clone)]
