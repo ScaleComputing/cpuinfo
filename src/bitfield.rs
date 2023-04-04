@@ -67,6 +67,37 @@ impl Bindable for Int {
     }
 }
 
+/// Wraps an X86Model representation
+/// These can have a number of weird conditions and are always going to be a part of a bit field
+#[derive(Serialize, Deserialize, Debug)]
+pub struct X86Model {
+    pub name: String,
+}
+
+const MODEL_START_BIT: u8 = 4;
+const EXTENDED_MODEL_START_BIT: u8 = 16;
+const FAMILY_START_BIT: u8 = 8;
+impl Bindable for X86Model {
+    type Rep = u32;
+    fn value(&self, reg_val: Register) -> Option<Self::Rep> {
+        let reg32 = reg_val as u32;
+        let nibble_mask = 0xF;
+        let model = (reg32 >> MODEL_START_BIT) & nibble_mask;
+        let famil_id = (reg32 >> FAMILY_START_BIT) & nibble_mask;
+
+        match famil_id {
+            6 | 0xF => {
+                let extended_model = (reg32 >> EXTENDED_MODEL_START_BIT) & nibble_mask;
+                Some((extended_model << 4) | model)
+            }
+            _ => Some(model),
+        }
+    }
+    fn name(&self) -> &String {
+        &self.name
+    }
+}
+
 pub struct Bound<'a, T: Bindable> {
     reg_val: Register,
     bits: &'a T,
@@ -96,15 +127,6 @@ impl<'a> fmt::Display for Bound<'a, Flag> {
     }
 }
 
-impl<'a, T: From<u32> + From<bool>> Facter<T> for Bound<'a, Flag> {
-    fn collect_fact(&self) -> GenericFact<T> {
-        GenericFact::new(
-            self.bits.name.clone(),
-            self.bits.value(self.reg_val).unwrap_or(false).into(),
-        )
-    }
-}
-
 impl<'a> fmt::Display for Bound<'a, Int> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
@@ -116,11 +138,26 @@ impl<'a> fmt::Display for Bound<'a, Int> {
     }
 }
 
-impl<'a, T: From<u32> + From<bool>> Facter<T> for Bound<'a, Int> {
+impl<'a, B, R, T: From<u32> + From<bool>> Facter<T> for Bound<'a, B>
+where
+    R: Default + Into<T>,
+    B: Bindable<Rep = R>,
+{
     fn collect_fact(&self) -> GenericFact<T> {
         GenericFact::new(
-            self.bits.name.clone(),
-            self.bits.value(self.reg_val).unwrap_or(0).into(),
+            self.bits.name().clone(),
+            self.bits.value(self.reg_val).unwrap_or_default().into(),
+        )
+    }
+}
+
+impl<'a> fmt::Display for Bound<'a, X86Model> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{} = {:>10}",
+            self.bits.name,
+            self.bits.value(self.reg_val).unwrap_or(0)
         )
     }
 }
@@ -130,11 +167,13 @@ impl<'a, T: From<u32> + From<bool>> Facter<T> for Bound<'a, Int> {
 pub enum Field {
     Int(Int),
     Flag(Flag),
+    X86Model(X86Model),
 }
 
 pub enum BoundField<'a> {
     Int(Bound<'a, Int>),
     Flag(Bound<'a, Flag>),
+    X86Model(Bound<'a, X86Model>),
 }
 
 impl<'a> BoundField<'a> {
@@ -142,6 +181,7 @@ impl<'a> BoundField<'a> {
         match field {
             Field::Int(bits) => Self::Int(Bound { reg_val, bits }),
             Field::Flag(bits) => Self::Flag(Bound { reg_val, bits }),
+            Field::X86Model(bits) => Self::X86Model(Bound { reg_val, bits }),
         }
     }
 }
@@ -151,6 +191,7 @@ impl<'a> fmt::Display for BoundField<'a> {
         match self {
             Self::Int(bound) => bound.fmt(f),
             Self::Flag(bound) => bound.fmt(f),
+            Self::X86Model(bound) => bound.fmt(f),
         }
     }
 }
@@ -160,6 +201,25 @@ impl<'a, T: From<bool> + From<u32>> Facter<T> for BoundField<'a> {
         match self {
             Self::Int(bound) => bound.collect_fact(),
             Self::Flag(bound) => bound.collect_fact(),
+            Self::X86Model(bound) => bound.collect_fact(),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::bitfield::Bindable;
+
+    #[test]
+    fn x86_model_test() {
+        let field_definition = super::X86Model {
+            name: "model".to_string(),
+        };
+        let regular_model: super::Register = 0x0AF50341;
+        assert_eq!(field_definition.value(regular_model).unwrap(), 0x4);
+        let extended_family_model: super::Register = 0x0AF50641;
+        assert_eq!(field_definition.value(extended_family_model).unwrap(), 0x54);
+        let extended_family_model: super::Register = 0x0AF50F41;
+        assert_eq!(field_definition.value(extended_family_model).unwrap(), 0x54);
     }
 }
