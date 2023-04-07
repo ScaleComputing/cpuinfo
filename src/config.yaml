@@ -16,7 +16,7 @@ cpuids:
             end: 4
         - type: X86Model
           name: model
-        - type: Int
+        - type: X86Family
           name: family
           bounds:
             start: 8

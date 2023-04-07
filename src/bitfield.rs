@@ -98,6 +98,31 @@ impl Bindable for X86Model {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct X86Family {
+    pub name: String,
+}
+
+const EXTENDED_FAMILY_START_BIT: u8 = 20;
+impl Bindable for X86Family {
+    type Rep = u32;
+    fn value(&self, reg_val: Register) -> Option<Self::Rep> {
+        let reg32 = reg_val as u32;
+        const FAMILY_MASK: u32 = 0xF;
+        const EXT_FAMILY_MASK: u32 = 0xFF;
+        let family = (reg32 >> FAMILY_START_BIT) & FAMILY_MASK;
+        let extended_family = (reg32 >> EXTENDED_FAMILY_START_BIT) & EXT_FAMILY_MASK;
+
+        match family {
+            0xF => Some(extended_family + family),
+            _ => Some(family),
+        }
+    }
+    fn name(&self) -> &String {
+        &self.name
+    }
+}
+
 pub struct Bound<'a, T: Bindable> {
     reg_val: Register,
     bits: &'a T,
@@ -162,18 +187,31 @@ impl<'a> fmt::Display for Bound<'a, X86Model> {
     }
 }
 
+impl<'a> fmt::Display for Bound<'a, X86Family> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{} = {:>10}",
+            self.bits.name,
+            self.bits.value(self.reg_val).unwrap_or(0)
+        )
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum Field {
     Int(Int),
     Flag(Flag),
     X86Model(X86Model),
+    X86Family(X86Family),
 }
 
 pub enum BoundField<'a> {
     Int(Bound<'a, Int>),
     Flag(Bound<'a, Flag>),
     X86Model(Bound<'a, X86Model>),
+    X86Family(Bound<'a, X86Family>),
 }
 
 impl<'a> BoundField<'a> {
@@ -182,6 +220,7 @@ impl<'a> BoundField<'a> {
             Field::Int(bits) => Self::Int(Bound { reg_val, bits }),
             Field::Flag(bits) => Self::Flag(Bound { reg_val, bits }),
             Field::X86Model(bits) => Self::X86Model(Bound { reg_val, bits }),
+            Field::X86Family(bits) => Self::X86Family(Bound { reg_val, bits }),
         }
     }
 }
@@ -192,6 +231,7 @@ impl<'a> fmt::Display for BoundField<'a> {
             Self::Int(bound) => bound.fmt(f),
             Self::Flag(bound) => bound.fmt(f),
             Self::X86Model(bound) => bound.fmt(f),
+            Self::X86Family(bound) => bound.fmt(f),
         }
     }
 }
@@ -202,6 +242,7 @@ impl<'a, T: From<bool> + From<u32>> Facter<T> for BoundField<'a> {
             Self::Int(bound) => bound.collect_fact(),
             Self::Flag(bound) => bound.collect_fact(),
             Self::X86Model(bound) => bound.collect_fact(),
+            Self::X86Family(bound) => bound.collect_fact(),
         }
     }
 }
@@ -221,5 +262,18 @@ mod test {
         assert_eq!(field_definition.value(extended_family_model).unwrap(), 0x54);
         let extended_family_model: super::Register = 0x0AF50F41;
         assert_eq!(field_definition.value(extended_family_model).unwrap(), 0x54);
+    }
+    #[test]
+    fn x86_family_test() {
+        let field_definition = super::X86Family {
+            name: "model".to_string(),
+        };
+        let regular_model: super::Register = 0x0AE50341;
+        assert_eq!(field_definition.value(regular_model).unwrap(), 0x3);
+        let extended_family_model: super::Register = 0x0AE50F41;
+        assert_eq!(
+            field_definition.value(extended_family_model).unwrap(),
+            0xAE + 0xF
+        );
     }
 }
