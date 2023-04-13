@@ -46,8 +46,9 @@ impl Command for Disp {
             display_raw()
         } else {
             println!("CPUID:");
+            let cpuid_db = cpuinfo::RunningCpuidDB::new();
             for (leaf, desc) in &config.cpuids {
-                if let Some(bound) = desc.bind_leaf(*leaf, &cpuid) {
+                if let Some(bound) = desc.bind_leaf(*leaf, &cpuid_db) {
                     println!("{:#010x}: {}", leaf, bound);
                 }
             }

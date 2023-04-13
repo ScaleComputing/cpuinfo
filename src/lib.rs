@@ -11,7 +11,7 @@ pub mod kvm;
 
 #[enum_dispatch]
 pub trait CpuidDB {
-    fn get_cpuid(&self, leaf: u32, sub_leaf: u32) -> CpuidResult;
+    fn get_cpuid(&self, leaf: u32, sub_leaf: u32) -> Option<CpuidResult>;
 }
 
 #[derive(Debug)]
@@ -37,22 +37,85 @@ pub fn cpuid(leaf: u32, sub_leaf: u32) -> CpuidResult {
     unsafe { __cpuid_count(leaf, sub_leaf) }
 }
 
-impl<T: Fn(u32, u32) -> CpuidResult> CpuidDB for T {
-    fn get_cpuid(&self, leaf: u32, sub_leaf: u32) -> CpuidResult {
-        self(leaf, sub_leaf)
+pub struct RunningCpuidDB {
+    basic_max: u32,
+    hypervisor_max: Option<u32>,
+    extended_max: u32,
+}
+
+impl RunningCpuidDB {
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+impl Default for RunningCpuidDB {
+    fn default() -> Self {
+        let CpuidResult {
+            eax: basic_max,
+            ebx: _,
+            ecx: _,
+            edx: _,
+        } = cpuid(0, 0);
+
+        // This leaf has a hypervisor feature flag in ECX bit 31 and is also the same in the
+        // extended leaf, letting us detect the presence of those sets
+        let model_leaf = cpuid(1, 0);
+
+        let hypervisor_max = if model_leaf.ecx & (1u32 << 31) != 0 {
+            let CpuidResult {
+                eax: max,
+                ebx: _,
+                ecx: _,
+                edx: _,
+            } = cpuid(CpuidFunction::Hypervisor.start_eax(), 0);
+            Some(max)
+        } else {
+            None
+        };
+
+        let CpuidResult {
+            eax: extended_max,
+            ebx: _,
+            ecx: _,
+            edx: _,
+        } = cpuid(CpuidFunction::Extended.start_eax(), 0);
+
+        Self {
+            basic_max,
+            hypervisor_max,
+            extended_max,
+        }
+    }
+}
+
+impl CpuidDB for RunningCpuidDB {
+    fn get_cpuid(&self, leaf: u32, sub_leaf: u32) -> Option<CpuidResult> {
+        if match leaf {
+            0..=0x3FFFFFFF => leaf <= self.basic_max,
+            0x40000000..=0x4fffffff => self
+                .hypervisor_max
+                .map_or(false, |max| leaf - 0x40000000 <= max),
+            0x80000000..=0x8fffffff => leaf - 0x80000000 <= self.extended_max,
+            _ => false,
+        } {
+            Some(cpuid(leaf, sub_leaf))
+        } else {
+            None
+        }
     }
 }
 
 #[enum_dispatch(CpuidDB)]
-pub enum CpuidType<'a> {
-    Func(&'a dyn Fn(u32, u32) -> CpuidResult),
+pub enum CpuidType {
+    Func(RunningCpuidDB),
     #[cfg(all(target_os = "linux", feature = "kvm"))]
     KvmInfo(kvm::KvmInfo),
 }
 
-impl<'a> CpuidType<'a> {
+impl CpuidType {
     pub fn func() -> Self {
-        Self::Func(&cpuid)
+        Self::Func(Default::default())
     }
 }
 

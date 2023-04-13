@@ -18,33 +18,24 @@ impl KvmInfo {
 }
 
 impl CpuidDB for KvmInfo {
-    fn get_cpuid(&self, leaf: u32, subleaf: u32) -> CpuidResult {
-        self.cpuid_info
-            .as_slice()
-            .iter()
-            .find_map(|entry| {
-                if entry.function == leaf {
-                    if (subleaf == 0 && (entry.flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) == 0)
-                        || (subleaf == entry.index)
-                    {
-                        Some(CpuidResult {
-                            eax: entry.eax,
-                            ebx: entry.ebx,
-                            ecx: entry.ecx,
-                            edx: entry.edx,
-                        })
-                    } else {
-                        None
-                    }
+    fn get_cpuid(&self, leaf: u32, subleaf: u32) -> Option<CpuidResult> {
+        self.cpuid_info.as_slice().iter().find_map(|entry| {
+            if entry.function == leaf {
+                if (subleaf == 0 && (entry.flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) == 0)
+                    || (subleaf == entry.index)
+                {
+                    Some(CpuidResult {
+                        eax: entry.eax,
+                        ebx: entry.ebx,
+                        ecx: entry.ecx,
+                        edx: entry.edx,
+                    })
                 } else {
                     None
                 }
-            })
-            .unwrap_or(CpuidResult {
-                eax: 0,
-                ebx: 0,
-                ecx: 0,
-                edx: 0,
-            })
+            } else {
+                None
+            }
+        })
     }
 }
