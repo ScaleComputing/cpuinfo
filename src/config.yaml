@@ -129,15 +129,15 @@ msrs:
   - name: Arch Capabilities
     address: 0x10a
     fields:
-      - {type: Flag, name: "Rogue Data Cache Load", bit: 0}
-      - {type: Flag, name: "Enhanced IBRS", bit: 1}
-      - type: Flag
-        name: MDS_NO
-        bit: 5
-      - type: Flag
-        name: TAA_NO
-        bit: 8
-      - {type: Flag, name: "TSX_CTRL", bit: 7}
+      - {type: Flag, name: RDCL_NO, bit: 0}
+      - {type: Flag, name: IBRS_ALL, bit: 1}
+      - {type: Flag, name: RSBA, bit: 2}
+      - {type: Flag, name: SKIP_L1DF_VMENTRY, bit: 3}
+      - {type: Flag, name: SSB_NO, bit: 4}
+      - {type: Flag, name: MDS_NO, bit: 5}
+      - {type: Flag, name: IF_PSCHANGE_MC_NO, bit: 6}
+      - {type: Flag, name: TSX_CTRL, bit: 7}
+      - {type: Flag, name: TAA_NO, bit: 8}
   - name: Basic VMX
     address: 0x480
     fields:
