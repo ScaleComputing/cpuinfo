@@ -3,7 +3,7 @@
 use super::facts::{self, GenericFact};
 use super::{
     bitfield::{self, Facter},
-    is_empty_leaf, CpuidDB,
+    CpuidDB,
 };
 use core::arch::x86_64::CpuidResult;
 use enum_dispatch::enum_dispatch;
@@ -54,7 +54,10 @@ impl DisplayLeaf for StartLeaf {
         leaf: u32,
         cpuid: &CPUIDFunc,
     ) -> Vec<CpuidResult> {
-        vec![cpuid.get_cpuid(leaf, 0)]
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid) => vec![cpuid],
+            None => vec![],
+        }
     }
     fn display_leaf(
         &self,
@@ -114,11 +117,9 @@ impl DisplayLeaf for StringLeaf {
         leaf: u32,
         cpuid: &CPUIDFunc,
     ) -> Vec<CpuidResult> {
-        let cpuid = cpuid.get_cpuid(leaf, 0);
-        if !is_empty_leaf(&cpuid) {
-            vec![cpuid]
-        } else {
-            vec![]
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid) => vec![cpuid],
+            None => vec![],
         }
     }
     fn display_leaf(
@@ -173,11 +174,9 @@ impl DisplayLeaf for BitFieldLeaf {
         leaf: u32,
         cpuid: &CPUIDFunc,
     ) -> Vec<CpuidResult> {
-        let cpuid = cpuid.get_cpuid(leaf, 0);
-        if !is_empty_leaf(&cpuid) {
-            vec![cpuid]
-        } else {
-            vec![]
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid) => vec![cpuid],
+            None => vec![],
         }
     }
     fn display_leaf(
