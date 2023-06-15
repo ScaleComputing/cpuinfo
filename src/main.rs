@@ -8,7 +8,7 @@ use cpuinfo::msr::MSRValue;
 use cpuinfo::*;
 use enum_dispatch::enum_dispatch;
 use msr::MSRDesc;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::convert::TryFrom;
 use std::error::Error;
@@ -166,7 +166,7 @@ impl Command for Facts {
     }
 }
 
-fn read_facts_from_file<T: DeserializeOwned>(fname: &str) -> Result<Vec<YAMLFact>, Box<dyn Error>> {
+fn read_facts_from_file(fname: &str) -> Result<Vec<YAMLFact>, Box<dyn Error>> {
     let file = std::fs::File::open(fname)?;
     Ok(serde_yaml::from_reader(file)?)
 }
@@ -214,9 +214,8 @@ struct Diff {
 
 impl Command for Diff {
     fn run(&self, _config: &Definition) -> Result<(), Box<dyn Error>> {
-        let from: YAMLFactSet =
-            read_facts_from_file::<serde_yaml::Value>(&self.from_file_name)?.into();
-        let to: YAMLFactSet = read_facts_from_file::<serde_yaml::Value>(&self.to_file_name)?.into();
+        let from: YAMLFactSet = read_facts_from_file(&self.from_file_name)?.into();
+        let to: YAMLFactSet = read_facts_from_file(&self.to_file_name)?.into();
 
         let output = DiffOutput {
             added: from.added_facts(&to).map(Clone::clone).collect(),
