@@ -54,10 +54,9 @@ impl DisplayLeaf for StartLeaf {
         leaf: u32,
         cpuid: &CPUIDFunc,
     ) -> Vec<CpuidResult> {
-        if let Some(cpuid) = cpuid.get_cpuid(leaf, 0) {
-            vec![cpuid]
-        } else {
-            vec![]
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid) => vec![cpuid],
+            None => vec![],
         }
     }
     fn display_leaf(
@@ -118,10 +117,9 @@ impl DisplayLeaf for StringLeaf {
         leaf: u32,
         cpuid: &CPUIDFunc,
     ) -> Vec<CpuidResult> {
-        if let Some(cpuid) = cpuid.get_cpuid(leaf, 0) {
-            vec![cpuid]
-        } else {
-            vec![]
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid) => vec![cpuid],
+            None => vec![],
         }
     }
     fn display_leaf(
@@ -176,10 +174,9 @@ impl DisplayLeaf for BitFieldLeaf {
         leaf: u32,
         cpuid: &CPUIDFunc,
     ) -> Vec<CpuidResult> {
-        if let Some(cpuid) = cpuid.get_cpuid(leaf, 0) {
-            vec![cpuid]
-        } else {
-            vec![]
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid) => vec![cpuid],
+            None => vec![],
         }
     }
     fn display_leaf(
