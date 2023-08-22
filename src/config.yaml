@@ -138,6 +138,13 @@ msrs:
       - {type: Flag, name: IF_PSCHANGE_MC_NO, bit: 6}
       - {type: Flag, name: TSX_CTRL, bit: 7}
       - {type: Flag, name: TAA_NO, bit: 8}
+      - {type: Flag, name: GDS_CTRL, bit: 25}
+      - {type: Flag, name: GDS_NO, bit: 26}
+  - name: Microcode Update Option Control
+    address: 0x123
+    fields:
+      - {type: Flag, name: "GDS_MITG_DIS", bit: 4}
+      - {type: Flag, name: "GDS_MITG_LOCK", bit: 5}
   - name: Basic VMX
     address: 0x480
     fields:
