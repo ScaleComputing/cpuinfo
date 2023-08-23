@@ -186,14 +186,9 @@ impl CpuidIterator {
 }
 
 fn is_empty_leaf(result: &CpuidResult) -> bool {
-    let CpuidResult {
-        eax,
-        ebx,
-        ecx,
-        edx: _,
-    } = result;
+    let CpuidResult { eax, ebx, ecx, edx } = result;
     // See
-    *eax == 0 && *ebx == 0 && *ecx & 0x0000FF00 == 0
+    *eax == 0 && *ebx == 0 && ((*ecx == 0 && *edx == 0) || (*ecx != 0 && *ecx & 0xFFFFFF00 == 0))
 }
 
 impl Iterator for CpuidIterator {
