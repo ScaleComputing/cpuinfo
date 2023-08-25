@@ -77,7 +77,7 @@ impl Command for Disp {
                 }
             }
 
-            if MSRDesc::is_availible() && self.skip_msr {
+            if MSRDesc::is_availible() && !self.skip_msr {
                 println!("MSRS:");
                 for msr in &config.msrs {
                     match msr.into_value() {
