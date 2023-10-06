@@ -77,7 +77,7 @@ impl Command for Disp {
                 }
             }
 
-            if MSRDesc::is_availible() && !self.skip_msr {
+            if MSRDesc::is_available() && !self.skip_msr {
                 println!("MSRS:");
                 for msr in &config.msrs {
                     match msr.into_value() {
@@ -119,7 +119,7 @@ fn collect_facts(
         CpuidType::KvmInfo(_) => true,
     };
 
-    if MSRDesc::is_availible() && !use_kvm {
+    if MSRDesc::is_available() && !use_kvm {
         for msr in &config.msrs {
             if let Ok(value) = MSRValue::try_from(msr) {
                 let mut facts = value.collect_facts();
