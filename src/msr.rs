@@ -69,7 +69,7 @@ impl MSRDesc {
         Ok(u64::from_le_bytes(msr_bytes))
     }
     #[cfg(all(target_os = "linux", feature = "use_msr"))]
-    pub fn is_availible() -> bool {
+    pub fn is_available() -> bool {
         true
     }
 
@@ -78,7 +78,7 @@ impl MSRDesc {
         Err(Error::NotAvailible)
     }
     #[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
-    pub fn is_availible() -> bool {
+    pub fn is_available() -> bool {
         false
     }
 

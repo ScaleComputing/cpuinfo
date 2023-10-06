@@ -36,8 +36,13 @@ enum CommandOpts {
 
 #[derive(StructOpt)]
 struct Disp {
-    #[structopt(short, long)]
+    #[structopt(short = "r", long)]
     display_raw: bool,
+    #[cfg(all(target_os = "linux", feature = "kvm"))]
+    #[structopt(long)]
+    skip_kvm: bool,
+    #[structopt(long)]
+    skip_msr: bool,
 }
 
 impl Command for Disp {
@@ -54,7 +59,7 @@ impl Command for Disp {
             }
 
             #[cfg(all(target_os = "linux", feature = "kvm"))]
-            {
+            if !self.skip_kvm {
                 use cpuinfo::kvm::KvmInfo;
                 use kvm_ioctls::Kvm;
                 println!("KVM-CPUID:");
@@ -72,7 +77,7 @@ impl Command for Disp {
                 }
             }
 
-            if MSRDesc::is_availible() {
+            if MSRDesc::is_available() && !self.skip_msr {
                 println!("MSRS:");
                 for msr in &config.msrs {
                     match msr.into_value() {
@@ -114,7 +119,7 @@ fn collect_facts(
         CpuidType::KvmInfo(_) => true,
     };
 
-    if MSRDesc::is_availible() && !use_kvm {
+    if MSRDesc::is_available() && !use_kvm {
         for msr in &config.msrs {
             if let Ok(value) = MSRValue::try_from(msr) {
                 let mut facts = value.collect_facts();
