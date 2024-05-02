@@ -4,11 +4,9 @@
 use super::bitfield::{self, Facter};
 use super::facts::{self, GenericFact};
 use serde::{Deserialize, Serialize};
+use std::fs;
 use std::vec::Vec;
-use std::{
-    convert::{self, TryInto},
-    error, fmt, io,
-};
+use std::{convert, error, fmt, io};
 
 #[derive(Debug)]
 pub enum Error {
@@ -39,52 +37,71 @@ impl convert::From<io::Error> for Error {
     }
 }
 
+pub trait MsrStore {
+    fn is_empty(&self) -> bool;
+    fn get_value<'a>(&self, desc: &'a MSRDesc) -> std::result::Result<MSRValue<'a>, Error>;
+}
+
+pub struct EmptyMSR {}
+
+impl MsrStore for EmptyMSR {
+    fn is_empty(&self) -> bool {
+        true
+    }
+    fn get_value<'a>(&self, _desc: &'a MSRDesc) -> std::result::Result<MSRValue<'a>, Error> {
+        Err(Error::NotAvailible)
+    }
+}
+
+#[cfg(all(target_os = "linux", feature = "use_msr"))]
+pub const LINUX_MSR_AVAILIBLE: bool = true;
+#[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
+pub const LINUX_MSR_AVAILIBLE: bool = false;
+
+#[cfg(all(target_os = "linux", feature = "use_msr"))]
+pub struct LinuxMsrStore {
+    msr_device: fs::File,
+}
+
+#[cfg(all(target_os = "linux", feature = "use_msr"))]
+impl LinuxMsrStore {
+    pub fn new() -> Result<LinuxMsrStore> {
+        Ok(LinuxMsrStore {
+            msr_device: fs::OpenOptions::new()
+                .read(true)
+                .open("/dev/cpu/0/msr")
+                .map_err(|e| match e.kind() {
+                    io::ErrorKind::NotFound => Error::NotAvailible,
+                    io::ErrorKind::PermissionDenied => Error::NotAvailible,
+                    _ => Error::IOError(e),
+                })?,
+        })
+    }
+}
+
+#[cfg(all(target_os = "linux", feature = "use_msr"))]
+impl MsrStore for LinuxMsrStore {
+    fn is_empty(&self) -> bool {
+        false
+    }
+    fn get_value<'a>(&self, desc: &'a MSRDesc) -> std::result::Result<MSRValue<'a>, Error> {
+        use std::os::unix::fs::FileExt;
+        let mut msr_bytes = [u8::MIN; 8];
+        self.msr_device
+            .read_at(&mut msr_bytes, desc.address.into())?;
+        Ok(MSRValue {
+            desc,
+            value: u64::from_le_bytes(msr_bytes),
+        })
+    }
+}
+
 /// Wraps a general description of an MSR
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MSRDesc {
     pub name: String,
     pub address: u32,
     pub fields: Vec<bitfield::Field>,
-}
-
-impl MSRDesc {
-    #[cfg(all(target_os = "linux", feature = "use_msr"))]
-    pub fn get_value(&self) -> Result<u64> {
-        use std::{
-            fs,
-            io::{Read, Seek},
-        };
-
-        let mut file = fs::OpenOptions::new()
-            .read(true)
-            .open("/dev/cpu/0/msr")
-            .map_err(|e| match e.kind() {
-                io::ErrorKind::NotFound => Error::NotAvailible,
-                io::ErrorKind::PermissionDenied => Error::NotAvailible,
-                _ => Error::IOError(e),
-            })?;
-        file.seek(io::SeekFrom::Start(self.address.into()))?;
-        let mut msr_bytes = [u8::MIN; 8];
-        file.read_exact(&mut msr_bytes)?;
-        Ok(u64::from_le_bytes(msr_bytes))
-    }
-    #[cfg(all(target_os = "linux", feature = "use_msr"))]
-    pub fn is_available() -> bool {
-        true
-    }
-
-    #[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
-    pub fn get_value(&self) -> Result<u64> {
-        Err(Error::NotAvailible)
-    }
-    #[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
-    pub fn is_available() -> bool {
-        false
-    }
-
-    pub fn into_value(&self) -> Result<MSRValue> {
-        self.try_into()
-    }
 }
 
 impl fmt::Display for MSRDesc {
@@ -96,16 +113,6 @@ impl fmt::Display for MSRDesc {
 pub struct MSRValue<'a> {
     pub desc: &'a MSRDesc,
     pub value: u64,
-}
-
-impl<'a> convert::TryFrom<&'a MSRDesc> for MSRValue<'a> {
-    type Error = Error;
-    fn try_from(desc: &'a MSRDesc) -> Result<MSRValue<'a>> {
-        Ok(MSRValue {
-            desc,
-            value: desc.get_value()?,
-        })
-    }
 }
 
 impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for MSRValue<'a> {

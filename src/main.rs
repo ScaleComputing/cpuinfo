@@ -4,13 +4,12 @@
 
 use cpuinfo::facts::{FactSet, Facter, GenericFact};
 use cpuinfo::layout::LeafDesc;
-use cpuinfo::msr::MSRValue;
+use cpuinfo::msr::MsrStore;
 use cpuinfo::*;
 use enum_dispatch::enum_dispatch;
 use msr::MSRDesc;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt;
 use structopt::StructOpt;
@@ -77,12 +76,19 @@ impl Command for Disp {
                 }
             }
 
-            if MSRDesc::is_available() && !self.skip_msr {
-                println!("MSRS:");
-                for msr in &config.msrs {
-                    match msr.into_value() {
-                        Ok(value) => println!("{}", value),
-                        Err(err) => println!("{} Error : {}", msr, err),
+            if !self.skip_msr {
+                if msr::LINUX_MSR_AVAILIBLE {
+                    match msr::LinuxMsrStore::new() {
+                        Ok(linux_store) => {
+                            println!("MSRS:");
+                            for msr in &config.msrs {
+                                match linux_store.get_value(msr) {
+                                    Ok(value) => println!("{}", value),
+                                    Err(err) => println!("{} Error : {}", msr, err),
+                                }
+                            }
+                        }
+                        Err(e) => println!("Error checking all msrs: {}", e),
                     }
                 }
             }
@@ -101,6 +107,7 @@ struct Facts {
 fn collect_facts(
     config: &Definition,
     cpuid_selected: CpuidType,
+    msr_store: Box<dyn MsrStore>,
 ) -> Result<Vec<YAMLFact>, Box<dyn std::error::Error>> {
     let mut ret: Vec<YAMLFact> = config
         .cpuids
@@ -113,15 +120,9 @@ fn collect_facts(
         })
         .collect();
 
-    let use_kvm = match cpuid_selected {
-        CpuidType::Func(_) => false,
-        #[cfg(all(target_os = "linux", feature = "kvm"))]
-        CpuidType::KvmInfo(_) => true,
-    };
-
-    if MSRDesc::is_available() && !use_kvm {
+    if msr_store.is_empty() {
         for msr in &config.msrs {
-            if let Ok(value) = MSRValue::try_from(msr) {
+            if let Ok(value) = msr_store.get_value(msr) {
                 let mut facts = value.collect_facts();
                 for fact in &mut facts {
                     fact.add_path("msr");
@@ -149,23 +150,32 @@ impl Command for Facts {
             }
         };
 
-        let cpuid_source = {
+        let (cpuid_source, msr_source): (_, Box<dyn MsrStore>) = {
             #[cfg(all(target_os = "linux", feature = "kvm"))]
             {
                 if let Some(kvm_info) = kvm_option {
-                    kvm_info.into()
+                    (
+                        kvm_info.into(),
+                        Box::new(msr::EmptyMSR {}) as Box<dyn MsrStore>,
+                    )
                 } else {
-                    CpuidType::func()
+                    (
+                        CpuidType::func(),
+                        Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>,
+                    )
                 }
             }
             #[cfg(any(not(target_os = "linux"), not(feature = "kvm")))]
             {
-                CpuidType::func()
+                (
+                    CpuidType::func(),
+                    Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>,
+                )
             }
         };
         println!(
             "{}",
-            serde_yaml::to_string(&collect_facts(config, cpuid_source)?)?
+            serde_yaml::to_string(&collect_facts(config, cpuid_source, msr_source)?)?
         );
         Ok(())
     }
