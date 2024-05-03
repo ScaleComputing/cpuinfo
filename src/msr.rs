@@ -4,7 +4,6 @@
 use super::bitfield::{self, Facter};
 use super::facts::{self, GenericFact};
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::vec::Vec;
 use std::{convert, error, fmt, io};
 
@@ -54,40 +53,44 @@ impl MsrStore for EmptyMSR {
 }
 
 #[cfg(all(target_os = "linux", feature = "use_msr"))]
-pub struct LinuxMsrStore {
-    msr_device: fs::File,
-}
+pub mod linux {
+    use super::*;
+    use std::fs;
+    use std::io;
 
-#[cfg(all(target_os = "linux", feature = "use_msr"))]
-impl LinuxMsrStore {
-    pub fn new() -> Result<LinuxMsrStore> {
-        Ok(LinuxMsrStore {
-            msr_device: fs::OpenOptions::new()
-                .read(true)
-                .open("/dev/cpu/0/msr")
-                .map_err(|e| match e.kind() {
-                    io::ErrorKind::NotFound => Error::NotAvailible,
-                    io::ErrorKind::PermissionDenied => Error::NotAvailible,
-                    _ => Error::IOError(e),
-                })?,
-        })
+    pub struct LinuxMsrStore {
+        msr_device: fs::File,
     }
-}
 
-#[cfg(all(target_os = "linux", feature = "use_msr"))]
-impl MsrStore for LinuxMsrStore {
-    fn is_empty(&self) -> bool {
-        false
+    impl LinuxMsrStore {
+        pub fn new() -> Result<LinuxMsrStore> {
+            Ok(LinuxMsrStore {
+                msr_device: fs::OpenOptions::new()
+                    .read(true)
+                    .open("/dev/cpu/0/msr")
+                    .map_err(|e| match e.kind() {
+                        io::ErrorKind::NotFound => Error::NotAvailible,
+                        io::ErrorKind::PermissionDenied => Error::NotAvailible,
+                        _ => Error::IOError(e),
+                    })?,
+            })
+        }
     }
-    fn get_value<'a>(&self, desc: &'a MSRDesc) -> std::result::Result<MSRValue<'a>, Error> {
-        use std::os::unix::fs::FileExt;
-        let mut msr_bytes = [u8::MIN; 8];
-        self.msr_device
-            .read_at(&mut msr_bytes, desc.address.into())?;
-        Ok(MSRValue {
-            desc,
-            value: u64::from_le_bytes(msr_bytes),
-        })
+
+    impl MsrStore for LinuxMsrStore {
+        fn is_empty(&self) -> bool {
+            false
+        }
+        fn get_value<'a>(&self, desc: &'a MSRDesc) -> std::result::Result<MSRValue<'a>, Error> {
+            use std::os::unix::fs::FileExt;
+            let mut msr_bytes = [u8::MIN; 8];
+            self.msr_device
+                .read_at(&mut msr_bytes, desc.address.into())?;
+            Ok(MSRValue {
+                desc,
+                value: u64::from_le_bytes(msr_bytes),
+            })
+        }
     }
 }
 

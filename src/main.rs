@@ -40,6 +40,7 @@ struct Disp {
     #[cfg(all(target_os = "linux", feature = "kvm"))]
     #[structopt(long)]
     skip_kvm: bool,
+    #[cfg(feature = "use_msr")]
     #[structopt(long)]
     skip_msr: bool,
 }
@@ -78,9 +79,9 @@ impl Command for Disp {
 
             #[cfg(feature = "use_msr")]
             if !self.skip_msr {
-                #[cfg(all(target_os = "linux"))]
+                #[cfg(target_os = "linux")]
                 {
-                    match msr::LinuxMsrStore::new() {
+                    match msr::linux::LinuxMsrStore::new() {
                         Ok(linux_store) => {
                             println!("MSRS:");
                             for msr in &config.msrs {
@@ -174,7 +175,7 @@ impl Command for Facts {
                     let msr = {
                         #[cfg(feature = "use_msr")]
                         {
-                            Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>
+                            Box::new(msr::linux::LinuxMsrStore::new()?) as Box<dyn MsrStore>
                         }
                         #[cfg(not(feature = "use_msr"))]
                         {
@@ -188,12 +189,12 @@ impl Command for Facts {
             {
                 (
                     CpuidType::func(),
-                    Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>,
+                    Box::new(msr::linux::LinuxMsrStore::new()?) as Box<dyn MsrStore>,
                 )
             }
-            #[cfg(all(
-                not(feature = "kvm"),
-                any(not(target_os = "linux"), not(feature = "use_msr"))
+            #[cfg(any(
+                not(target_os = "linux"),
+                all(not(feature = "kvm"), not(feature = "use_msr"))
             ))]
             {
                 (
