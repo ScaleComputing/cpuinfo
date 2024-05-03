@@ -54,11 +54,6 @@ impl MsrStore for EmptyMSR {
 }
 
 #[cfg(all(target_os = "linux", feature = "use_msr"))]
-pub const LINUX_MSR_AVAILIBLE: bool = true;
-#[cfg(any(not(target_os = "linux"), not(feature = "use_msr")))]
-pub const LINUX_MSR_AVAILIBLE: bool = false;
-
-#[cfg(all(target_os = "linux", feature = "use_msr"))]
 pub struct LinuxMsrStore {
     msr_device: fs::File,
 }
