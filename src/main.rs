@@ -76,8 +76,10 @@ impl Command for Disp {
                 }
             }
 
+            #[cfg(feature = "use_msr")]
             if !self.skip_msr {
-                if msr::LINUX_MSR_AVAILIBLE {
+                #[cfg(all(target_os = "linux"))]
+                {
                     match msr::LinuxMsrStore::new() {
                         Ok(linux_store) => {
                             println!("MSRS:");
@@ -89,6 +91,25 @@ impl Command for Disp {
                             }
                         }
                         Err(e) => println!("Error checking all msrs: {}", e),
+                    }
+                }
+                #[cfg(all(target_os = "linux", feature = "kvm"))]
+                if !self.skip_kvm {
+                    use cpuinfo::kvm::KvmMsrInfo;
+                    use kvm_ioctls::Kvm;
+                    println!("KVM-MSR:");
+                    if let Err(e) = {
+                        let kvm = Kvm::new()?;
+                        let kvm_msr = KvmMsrInfo::new(&kvm)?;
+                        for msr in &config.msrs {
+                            match kvm_msr.get_value(msr) {
+                                Ok(value) => println!("{}", value),
+                                Err(err) => println!("{} Error : {}", msr, err),
+                            }
+                        }
+                        Ok::<_, Box<dyn Error>>(())
+                    } {
+                        println!("Error Processing KVM-MSR: {}", e);
                     }
                 }
             }
@@ -120,7 +141,7 @@ fn collect_facts(
         })
         .collect();
 
-    if msr_store.is_empty() {
+    if !msr_store.is_empty() {
         for msr in &config.msrs {
             if let Ok(value) = msr_store.get_value(msr) {
                 let mut facts = value.collect_facts();
@@ -137,39 +158,47 @@ fn collect_facts(
 
 impl Command for Facts {
     fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
-        #[cfg(all(target_os = "linux", feature = "kvm"))]
-        let kvm_option = {
-            use cpuinfo::kvm::KvmInfo;
-            use kvm_ioctls::Kvm;
-            if self.use_kvm {
-                println!("using kvm");
-                let kvm = Kvm::new()?;
-                Some(KvmInfo::new(&kvm)?)
-            } else {
-                None
-            }
-        };
-
         let (cpuid_source, msr_source): (_, Box<dyn MsrStore>) = {
             #[cfg(all(target_os = "linux", feature = "kvm"))]
             {
-                if let Some(kvm_info) = kvm_option {
+                if self.use_kvm {
+                    use cpuinfo::kvm::KvmInfo;
+                    use kvm::KvmMsrInfo;
+                    use kvm_ioctls::Kvm;
+                    let kvm = Kvm::new()?;
                     (
-                        kvm_info.into(),
-                        Box::new(msr::EmptyMSR {}) as Box<dyn MsrStore>,
+                        KvmInfo::new(&kvm)?.into(),
+                        Box::new(KvmMsrInfo::new(&kvm)?) as Box<dyn MsrStore>,
                     )
                 } else {
-                    (
-                        CpuidType::func(),
-                        Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>,
-                    )
+                    let msr = {
+                        #[cfg(feature = "use_msr")]
+                        {
+                            Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>
+                        }
+                        #[cfg(not(feature = "use_msr"))]
+                        {
+                            Box::new(msr::EmptyMSR {})
+                        }
+                    };
+                    (CpuidType::func(), msr)
                 }
             }
-            #[cfg(any(not(target_os = "linux"), not(feature = "kvm")))]
+            #[cfg(all(target_os = "linux", not(feature = "kvm"), feature = "use_msr"))]
             {
                 (
                     CpuidType::func(),
                     Box::new(msr::LinuxMsrStore::new()?) as Box<dyn MsrStore>,
+                )
+            }
+            #[cfg(all(
+                not(feature = "kvm"),
+                any(not(target_os = "linux"), not(feature = "use_msr"))
+            ))]
+            {
+                (
+                    CpuidType::func(),
+                    Box::new(msr::EmptyMSR {}) as Box<dyn MsrStore>,
                 )
             }
         };
