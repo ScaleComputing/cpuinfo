@@ -2,7 +2,7 @@
 // better performance but is not always intuitive behaviour.
 // use std::io::BufWriter;
 
-use clap::{self, Args, Parser, Subcommand};
+use clap::{self, Args, Parser, Subcommand, ValueEnum};
 use cpuinfo::facts::{FactSet, Facter, GenericFact};
 use cpuinfo::layout::LeafDesc;
 use cpuinfo::msr::MsrStore;
@@ -119,11 +119,19 @@ impl Command for Disp {
     }
 }
 
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum FactsOutput {
+    Yaml,
+    Json,
+}
+
 #[derive(Clone, Args)]
 struct Facts {
     #[cfg(all(target_os = "linux", feature = "kvm"))]
     #[arg(short, long)]
     use_kvm: bool,
+    #[arg(short, long, value_enum, default_value = "yaml")]
+    out_type: FactsOutput,
 }
 
 fn collect_facts(
@@ -203,9 +211,13 @@ impl Command for Facts {
                 )
             }
         };
+        let facts = collect_facts(config, cpuid_source, msr_source)?;
         println!(
             "{}",
-            serde_yaml::to_string(&collect_facts(config, cpuid_source, msr_source)?)?
+            match self.out_type {
+                FactsOutput::Yaml => serde_yaml::to_string(&facts)?,
+                FactsOutput::Json => serde_json::to_string(&facts)?,
+            }
         );
         Ok(())
     }
