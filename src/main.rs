@@ -2,6 +2,7 @@
 // better performance but is not always intuitive behaviour.
 // use std::io::BufWriter;
 
+use clap::{self, Args, Parser, Subcommand};
 use cpuinfo::facts::{FactSet, Facter, GenericFact};
 use cpuinfo::layout::LeafDesc;
 use cpuinfo::msr::MsrStore;
@@ -12,7 +13,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
-use structopt::StructOpt;
 
 type YAMLFact = GenericFact<serde_yaml::Value>;
 type YAMLFactSet = FactSet<serde_yaml::Value>;
@@ -26,28 +26,28 @@ trait Command {
 // Documentation on how to use:
 // https://docs.rs/structopt/0.2.10/structopt/index.html#how-to-derivestructopt
 #[enum_dispatch(Command)]
-#[derive(StructOpt)]
+#[derive(Clone, Subcommand)]
 enum CommandOpts {
     Disp(Disp),
     Facts(Facts),
     Diff(Diff),
 }
 
-#[derive(StructOpt)]
+#[derive(Clone, Args)]
 struct Disp {
-    #[structopt(short = "r", long)]
-    display_raw: bool,
+    #[arg(short, long)]
+    raw: bool,
     #[cfg(all(target_os = "linux", feature = "kvm"))]
-    #[structopt(long)]
+    #[arg(long)]
     skip_kvm: bool,
     #[cfg(feature = "use_msr")]
-    #[structopt(long)]
+    #[arg(long)]
     skip_msr: bool,
 }
 
 impl Command for Disp {
     fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
-        if self.display_raw {
+        if self.raw {
             display_raw()
         } else {
             println!("CPUID:");
@@ -119,10 +119,10 @@ impl Command for Disp {
     }
 }
 
-#[derive(StructOpt)]
+#[derive(Clone, Args)]
 struct Facts {
     #[cfg(all(target_os = "linux", feature = "kvm"))]
-    #[structopt(short, long)]
+    #[arg(short, long)]
     use_kvm: bool,
 }
 
@@ -249,11 +249,11 @@ impl fmt::Display for DiffFoundError {
 
 impl std::error::Error for DiffFoundError {}
 
-#[derive(StructOpt)]
+#[derive(Clone, Args)]
 struct Diff {
     from_file_name: String,
     to_file_name: String,
-    #[structopt(short, long)]
+    #[arg(short, long)]
     verbose: bool,
 }
 
@@ -314,10 +314,15 @@ fn display_raw() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[derive(Clone, Parser)]
+struct CmdLine {
+    #[command(subcommand)]
+    command: CommandOpts,
+}
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = CommandOpts::from_args();
+    let args = CmdLine::parse();
 
     let config = find_read_config()?;
 
-    args.run(&config)
+    args.command.run(&config)
 }
