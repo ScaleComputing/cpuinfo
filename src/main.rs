@@ -119,7 +119,7 @@ impl Command for Disp {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Clone, PartialEq, Eq, ValueEnum)]
 enum FactsOutput {
     Yaml,
     Json,
