@@ -39,6 +39,33 @@ cpuids:
           name: vme
           bit: 0
 
+  0x00000007:
+    name: "Structured Extened Flags"
+    data_type:
+      type: SubLeafBitField
+      leaves:
+        - eax:
+          - {type: Int, name: "Sub-Leaf Count", bounds: {start: 0, end: 31}}
+          ebx:
+          - {type: Flag, name: HLE, bit: 4}
+          - {type: Flag, name: RTM, bit: 11}
+          - {type: Flag, name: MPX, bit: 14}
+          ecx: []
+          edx:
+          - {type: Flag, name: "AVX512 VP2Intersect", bit: 8}
+          - {type: Flag, name: "RTM Always Abort", bit: 11}
+          - {type: Flag, name: "RTM Force Abort", bit: 13}
+        - eax:
+          - {type: Flag, name: "AVX VNNI", bit: 14}
+          ebx: []
+          ecx: []
+          edx: []
+        - eax: []
+          ebx: []
+          ecx: []
+          edx:
+          - {type: Flag, name: PSFD, bit: 0}
+
   0x40000000:
     name: "Hypervisor ID"
     data_type:
