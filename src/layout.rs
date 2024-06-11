@@ -258,8 +258,7 @@ impl DisplayLeaf for BitFieldMultiLeaf {
         self.leaves
             .iter()
             .zip(leaves)
-            .map(|(field, leaf)| field.get_facts(&[*leaf]).into_iter())
-            .flatten()
+            .flat_map(|(field, leaf)| field.get_facts(&[*leaf]).into_iter())
             .collect()
     }
 }
