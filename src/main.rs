@@ -175,7 +175,13 @@ impl Command for Facts {
                     let msr = {
                         #[cfg(feature = "use_msr")]
                         {
-                            Box::new(msr::linux::LinuxMsrStore::new()?) as Box<dyn MsrStore>
+                            match msr::linux::LinuxMsrStore::new() {
+                                Ok(store) => Box::new(store) as Box<dyn MsrStore>,
+                                Err(e) => {
+                                    eprintln!("Error accessing MSRs: {}", e);
+                                    Box::new(msr::EmptyMSR {})
+                                }
+                            }
                         }
                         #[cfg(not(feature = "use_msr"))]
                         {
