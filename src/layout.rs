@@ -215,6 +215,54 @@ impl DisplayLeaf for BitFieldLeaf {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BitFieldMultiLeaf {
+    leaves: Vec<BitFieldLeaf>,
+}
+
+impl DisplayLeaf for BitFieldMultiLeaf {
+    fn scan_sub_leaves<CPUIDFunc: CpuidDB>(
+        &self,
+        leaf: u32,
+        cpuid: &CPUIDFunc,
+    ) -> Vec<CpuidResult> {
+        match cpuid.get_cpuid(leaf, 0) {
+            Some(cpuid_start_leaf) => {
+                let count = cpuid_start_leaf.eax;
+                let mut ret = vec![cpuid_start_leaf];
+                for leaf_id in 1..=count {
+                    match cpuid.get_cpuid(leaf, leaf_id) {
+                        Some(cpuid_value) => ret.push(cpuid_value),
+                        None => break,
+                    }
+                }
+                ret
+            }
+            None => vec![],
+        }
+    }
+    fn display_leaf(
+        &self,
+        leaves: &[CpuidResult],
+        f: &mut fmt::Formatter<'_>,
+    ) -> Result<(), fmt::Error> {
+        for (field, leaf) in self.leaves.iter().zip(leaves) {
+            field.display_leaf(&[*leaf], f)?;
+        }
+        Ok(())
+    }
+    fn get_facts<T: From<String> + From<u32> + From<bool>>(
+        &self,
+        leaves: &[CpuidResult],
+    ) -> Vec<GenericFact<T>> {
+        self.leaves
+            .iter()
+            .zip(leaves)
+            .flat_map(|(field, leaf)| field.get_facts(&[*leaf]).into_iter())
+            .collect()
+    }
+}
+
 /// Enum to aid in serializing and deserializing leaf information
 #[enum_dispatch(DisplayLeaf)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -223,6 +271,7 @@ pub enum LeafType {
     Start(StartLeaf),
     String(StringLeaf),
     BitField(BitFieldLeaf),
+    SubLeafBitField(BitFieldMultiLeaf),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
