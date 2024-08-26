@@ -5,6 +5,7 @@ version = "0.2.0"
 authors = ["Joshua Job <jjob@scalecomputing.com>"]
 edition = "2018"
 license = "MIT"
+repository = "https://github.com/ScaleComputing/cpuinfo.git"
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
