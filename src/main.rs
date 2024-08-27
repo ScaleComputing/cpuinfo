@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
+use std::path::{Path, PathBuf};
 
 type YAMLFact = GenericFact<serde_yaml::Value>;
 type YAMLFactSet = FactSet<serde_yaml::Value>;
@@ -37,6 +38,8 @@ enum CommandOpts {
 struct Disp {
     #[arg(short, long)]
     raw: bool,
+    #[arg(long)]
+    skip_cpu: bool,
     #[cfg(all(target_os = "linux", feature = "kvm"))]
     #[arg(long)]
     skip_kvm: bool,
@@ -50,11 +53,13 @@ impl Command for Disp {
         if self.raw {
             display_raw()
         } else {
-            println!("CPUID:");
-            let cpuid_db = cpuinfo::RunningCpuidDB::new();
-            for (leaf, desc) in &config.cpuids {
-                if let Some(bound) = desc.bind_leaf(*leaf, &cpuid_db) {
-                    println!("{:#010x}: {}", leaf, bound);
+            if !self.skip_cpu {
+                println!("CPUID:");
+                let cpuid_db = cpuinfo::RunningCpuidDB::new();
+                for (leaf, desc) in &config.cpuids {
+                    if let Some(bound) = desc.bind_leaf(*leaf, &cpuid_db) {
+                        println!("{:#010x}: {}", leaf, bound);
+                    }
                 }
             }
 
@@ -307,6 +312,17 @@ struct Definition {
     pub msrs: Vec<MSRDesc>,
 }
 
+impl Definition {
+    pub fn union(&mut self, b: Definition) {
+        let Definition {
+            mut cpuids,
+            mut msrs,
+        } = b;
+        self.cpuids.append(&mut cpuids);
+        self.msrs.append(&mut msrs);
+    }
+}
+
 fn find_read_config() -> Result<Definition, Box<dyn std::error::Error>> {
     let file = include_str!("config.yaml");
     Ok(serde_yaml::from_str(file)?)
@@ -332,15 +348,35 @@ fn display_raw() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+fn read_additional_configs<Paths, P>(
+    def: &mut Definition,
+    paths: Paths,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    Paths: Iterator<Item = P>,
+    P: AsRef<Path> + Sized,
+{
+    for path in paths {
+        let file = std::fs::read(path)?;
+        let definition = serde_yaml::from_slice(&file)?;
+        def.union(definition);
+    }
+    Ok(())
+}
+
 #[derive(Clone, Parser)]
 struct CmdLine {
+    #[arg(short, long)]
+    add_config: Vec<PathBuf>,
     #[command(subcommand)]
     command: CommandOpts,
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = CmdLine::parse();
 
-    let config = find_read_config()?;
+    let mut config = find_read_config()?;
+
+    read_additional_configs(&mut config, args.add_config.iter())?;
 
     args.command.run(&config)
 }
