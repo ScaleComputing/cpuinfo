@@ -95,7 +95,7 @@ pub mod linux {
 }
 
 /// Wraps a general description of an MSR
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MSRDesc {
     pub name: String,
     pub address: u32,

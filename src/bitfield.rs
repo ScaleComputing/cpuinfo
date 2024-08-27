@@ -26,7 +26,7 @@ pub trait Facter<T: From<u32> + From<bool>> {
 }
 
 ///Wraps a bit flag, usually representing if a feature is present or not
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Flag {
     pub name: String,
     pub bit: u8,
@@ -44,7 +44,7 @@ impl Bindable for Flag {
 }
 
 ///Wraps an integer value from a bit field
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Int {
     pub name: String,
     pub bounds: ops::Range<u8>,
@@ -69,7 +69,7 @@ impl Bindable for Int {
 
 /// Wraps an X86Model representation
 /// These can have a number of weird conditions and are always going to be a part of a bit field
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct X86Model {
     pub name: String,
 }
@@ -98,7 +98,7 @@ impl Bindable for X86Model {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct X86Family {
     pub name: String,
 }
@@ -198,7 +198,7 @@ impl<'a> fmt::Display for Bound<'a, X86Family> {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
 pub enum Field {
     Int(Int),
