@@ -9,7 +9,7 @@ use std::{convert, error, fmt, io};
 
 #[derive(Debug)]
 pub enum Error {
-    NotAvailible,
+    NotAvailible(String),
     IOError(io::Error),
 }
 
@@ -18,7 +18,7 @@ pub type Result<V> = std::result::Result<V, Error>;
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::NotAvailible => write!(f, "MSR Feature not availible"),
+            Error::NotAvailible(name) => write!(f, "MSR Feature not availible file: {}", name),
             Error::IOError(e) => write!(f, "IOError: {}", e),
         }
     }
@@ -48,7 +48,7 @@ impl MsrStore for EmptyMSR {
         true
     }
     fn get_value<'a>(&self, _desc: &'a MSRDesc) -> std::result::Result<MSRValue<'a>, Error> {
-        Err(Error::NotAvailible)
+        Err(Error::NotAvailible("".to_string()))
     }
 }
 
@@ -63,14 +63,15 @@ pub mod linux {
     }
 
     impl LinuxMsrStore {
-        pub fn new() -> Result<LinuxMsrStore> {
+        pub fn new(cpu: usize) -> Result<LinuxMsrStore> {
+            let file_name = format!("/dev/cpu/{}/msr", cpu);
             Ok(LinuxMsrStore {
                 msr_device: fs::OpenOptions::new()
                     .read(true)
-                    .open("/dev/cpu/0/msr")
+                    .open(file_name.clone())
                     .map_err(|e| match e.kind() {
-                        io::ErrorKind::NotFound => Error::NotAvailible,
-                        io::ErrorKind::PermissionDenied => Error::NotAvailible,
+                        io::ErrorKind::NotFound => Error::NotAvailible(file_name),
+                        io::ErrorKind::PermissionDenied => Error::NotAvailible(file_name),
                         _ => Error::IOError(e),
                     })?,
             })

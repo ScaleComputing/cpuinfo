@@ -86,6 +86,6 @@ impl MsrStore for KvmMsrInfo {
                     None
                 }
             })
-            .ok_or_else(|| msr::Error::NotAvailible {})
+            .ok_or_else(|| msr::Error::NotAvailible("/dev/kvm".to_string()))
     }
 }
