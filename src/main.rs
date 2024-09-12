@@ -3,6 +3,7 @@
 // use std::io::BufWriter;
 
 use clap::{self, Args, Parser, Subcommand, ValueEnum};
+use core_affinity::CoreId;
 use cpuinfo::facts::{FactSet, Facter, GenericFact};
 use cpuinfo::layout::LeafDesc;
 use cpuinfo::msr::MsrStore;
@@ -36,6 +37,8 @@ enum CommandOpts {
 
 #[derive(Clone, Args)]
 struct Disp {
+    #[arg(short, long, default_value = "0")]
+    cpu: usize,
     #[arg(short, long)]
     raw: bool,
     #[arg(long)]
@@ -50,6 +53,9 @@ struct Disp {
 
 impl Command for Disp {
     fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
+        if !core_affinity::set_for_current(CoreId { id: self.cpu }) {
+            panic!("Unable to pin to core {}", self.cpu);
+        }
         if self.raw {
             display_raw()
         } else {
@@ -86,7 +92,7 @@ impl Command for Disp {
             if !self.skip_msr {
                 #[cfg(target_os = "linux")]
                 {
-                    match msr::linux::LinuxMsrStore::new() {
+                    match msr::linux::LinuxMsrStore::new(self.cpu) {
                         Ok(linux_store) => {
                             println!("MSRS:");
                             for msr in &config.msrs {
@@ -132,6 +138,8 @@ enum FactsOutput {
 
 #[derive(Clone, Args)]
 struct Facts {
+    #[arg(short, long, default_value = "0")]
+    cpu: usize,
     #[cfg(all(target_os = "linux", feature = "kvm"))]
     #[arg(short, long)]
     use_kvm: bool,
@@ -172,6 +180,9 @@ fn collect_facts(
 
 impl Command for Facts {
     fn run(&self, config: &Definition) -> Result<(), Box<dyn std::error::Error>> {
+        if !core_affinity::set_for_current(CoreId { id: self.cpu }) {
+            panic!("Unable to pin to core {}", self.cpu);
+        }
         let (cpuid_source, msr_source): (_, Box<dyn MsrStore>) = {
             #[cfg(all(target_os = "linux", feature = "kvm"))]
             {
@@ -188,7 +199,7 @@ impl Command for Facts {
                     let msr = {
                         #[cfg(feature = "use_msr")]
                         {
-                            match msr::linux::LinuxMsrStore::new() {
+                            match msr::linux::LinuxMsrStore::new(self.cpu) {
                                 Ok(store) => Box::new(store) as Box<dyn MsrStore>,
                                 Err(e) => {
                                     eprintln!("Error accessing MSRs: {}", e);
