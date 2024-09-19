@@ -55,6 +55,8 @@ cpuids:
           - {type: Flag, name: "AVX512 VP2Intersect", bit: 8}
           - {type: Flag, name: "RTM Always Abort", bit: 11}
           - {type: Flag, name: "RTM Force Abort", bit: 13}
+          - {type: Flag, name: "Arch_Capabilities", bit: 29}
+          - {type: Flag, name: "Core_Capabilities", bit: 30}
         - eax:
           - {type: Flag, name: "AVX VNNI", bit: 14}
           ebx: []
@@ -153,6 +155,11 @@ cpuids:
     data_type:
       type: String
 msrs:
+  - name: "Core_Capabilities"
+    address: 0xCF
+    fields:
+      - {type: Flag, name: "SPLIT_LOCK_DISABLE_SUPPORTED", bit: 5}
+
   - name: Arch Capabilities
     address: 0x10a
     fields:
