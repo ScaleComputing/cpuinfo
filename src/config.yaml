@@ -50,11 +50,14 @@ cpuids:
           - {type: Flag, name: HLE, bit: 4}
           - {type: Flag, name: RTM, bit: 11}
           - {type: Flag, name: MPX, bit: 14}
+          - {type: Flag, name: PT, bit: 25}
           ecx: []
           edx:
           - {type: Flag, name: "AVX512 VP2Intersect", bit: 8}
           - {type: Flag, name: "RTM Always Abort", bit: 11}
           - {type: Flag, name: "RTM Force Abort", bit: 13}
+          - {type: Flag, name: "Arch_Capabilities", bit: 29}
+          - {type: Flag, name: "Core_Capabilities", bit: 30}
         - eax:
           - {type: Flag, name: "AVX VNNI", bit: 14}
           ebx: []
@@ -153,6 +156,11 @@ cpuids:
     data_type:
       type: String
 msrs:
+  - name: "Core_Capabilities"
+    address: 0xCF
+    fields:
+      - {type: Flag, name: "SPLIT_LOCK_DISABLE_SUPPORTED", bit: 5}
+
   - name: Arch Capabilities
     address: 0x10a
     fields:
@@ -172,6 +180,18 @@ msrs:
     fields:
       - {type: Flag, name: "GDS_MITG_DIS", bit: 4}
       - {type: Flag, name: "GDS_MITG_LOCK", bit: 5}
+  - name: "Perf_Capabilities"
+    address: 0x345
+    fields:
+      - {type: Int, name: "LBR_FMT", bounds: {start: 0, end: 5}}
+      - {type: Flag, name: "PEBSTrap", bit: 6}
+      - {type: Flag, name: "PEBSArchRegs", bit: 7}
+      - {type: Int, name: "PEBS_FMT",bounds: {start: 8, end: 11}}
+      - {type: Flag, name: "SMM_FREEZE", bit: 12}
+      - {type: Flag, name: "FULL_WRITE", bit: 13}
+      - {type: Flag, name: "PEBS_BASELINE", bit: 14}
+      - {type: Flag, name: "METRICS_AVAIL", bit: 15}
+      - {type: Flag, name: "PEBS_PT_AVAIL", bit: 16}
   - name: Basic VMX
     address: 0x480
     fields:
