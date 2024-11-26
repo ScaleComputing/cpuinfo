@@ -27,12 +27,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, windows-latest ]
+        rust: [ stable ]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@v1
         with:
+          toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
       - name: Build rustdoc
@@ -43,13 +45,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-          - os: windows-latest
+        os: [ ubuntu-latest, windows-latest ]
+        rust: [ stable, 1.62, 1.63 ]
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
       - uses: Swatinem/rust-cache@v2
       - name: Build
         run: cargo build
