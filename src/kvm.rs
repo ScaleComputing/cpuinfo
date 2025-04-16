@@ -10,7 +10,7 @@ use std::error::Error;
  * Other structures such as CPUInfo will then make it accessible like the cpuid function
  */
 pub struct KvmInfo {
-    cpuid_info: kvm_bindings::fam_wrappers::CpuId,
+    cpuid_info: kvm_bindings::CpuId,
 }
 
 impl KvmInfo {
