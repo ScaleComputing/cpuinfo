@@ -335,7 +335,7 @@ pub struct BoundLeaf<'a> {
     pub sub_leaves: Vec<CpuidResult>,
 }
 
-impl<'a> BoundLeaf<'a> {
+impl BoundLeaf<'_> {
     pub fn get_facts<T: From<u32> + From<bool> + From<String>>(&self) -> Vec<GenericFact<T>> {
         let mut facts = self.desc.get_facts(&self.sub_leaves);
         facts.iter_mut().for_each(|i| {
@@ -345,13 +345,13 @@ impl<'a> BoundLeaf<'a> {
     }
 }
 
-impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for BoundLeaf<'a> {
+impl<T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for BoundLeaf<'_> {
     fn collect_facts(&self) -> Vec<GenericFact<T>> {
         self.get_facts()
     }
 }
 
-impl<'a> fmt::Display for BoundLeaf<'a> {
+impl fmt::Display for BoundLeaf<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         self.desc.display_leaf(&self.sub_leaves, f)
     }
