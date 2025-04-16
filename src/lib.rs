@@ -95,7 +95,7 @@ impl CpuidDB for RunningCpuidDB {
             0..=0x3FFFFFFF => leaf <= self.basic_max,
             0x40000000..=0x4fffffff => self
                 .hypervisor_max
-                .map_or(false, |max| leaf - 0x40000000 <= max),
+                .is_some_and(|max| leaf - 0x40000000 <= max),
             0x80000000..=0x8fffffff => leaf - 0x80000000 <= self.extended_max,
             _ => false,
         } {

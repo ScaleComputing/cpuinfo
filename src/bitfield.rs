@@ -137,7 +137,7 @@ impl<'a, T: Bindable> Bound<'a, T> {
     }
 }
 
-impl<'a> fmt::Display for Bound<'a, Flag> {
+impl fmt::Display for Bound<'_, Flag> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -152,7 +152,7 @@ impl<'a> fmt::Display for Bound<'a, Flag> {
     }
 }
 
-impl<'a> fmt::Display for Bound<'a, Int> {
+impl fmt::Display for Bound<'_, Int> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -163,7 +163,7 @@ impl<'a> fmt::Display for Bound<'a, Int> {
     }
 }
 
-impl<'a, B, R, T: From<u32> + From<bool>> Facter<T> for Bound<'a, B>
+impl<B, R, T: From<u32> + From<bool>> Facter<T> for Bound<'_, B>
 where
     R: Default + Into<T>,
     B: Bindable<Rep = R>,
@@ -176,7 +176,7 @@ where
     }
 }
 
-impl<'a> fmt::Display for Bound<'a, X86Model> {
+impl fmt::Display for Bound<'_, X86Model> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -187,7 +187,7 @@ impl<'a> fmt::Display for Bound<'a, X86Model> {
     }
 }
 
-impl<'a> fmt::Display for Bound<'a, X86Family> {
+impl fmt::Display for Bound<'_, X86Family> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -225,7 +225,7 @@ impl<'a> BoundField<'a> {
     }
 }
 
-impl<'a> fmt::Display for BoundField<'a> {
+impl fmt::Display for BoundField<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::Int(bound) => bound.fmt(f),
@@ -236,7 +236,7 @@ impl<'a> fmt::Display for BoundField<'a> {
     }
 }
 
-impl<'a, T: From<bool> + From<u32>> Facter<T> for BoundField<'a> {
+impl<T: From<bool> + From<u32>> Facter<T> for BoundField<'_> {
     fn collect_fact(&self) -> GenericFact<T> {
         match self {
             Self::Int(bound) => bound.collect_fact(),
