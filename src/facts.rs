@@ -113,7 +113,7 @@ impl<T: PartialEq + Eq + Hash> FactSet<T> {
     pub fn added_facts<'to>(
         &'to self,
         to: &'to Self,
-    ) -> NameIteration<'to, T, impl Iterator<Item = &String>> {
+    ) -> NameIteration<'to, T, impl Iterator<Item = &'to String>> {
         let name_iter = to.name_set.difference(&self.name_set);
         NameIteration {
             iter: name_iter,
@@ -125,7 +125,7 @@ impl<T: PartialEq + Eq + Hash> FactSet<T> {
     pub fn removed_facts<'to>(
         &'to self,
         to: &'to Self,
-    ) -> NameIteration<'to, T, impl Iterator<Item = &String>> {
+    ) -> NameIteration<'to, T, impl Iterator<Item = &'to String>> {
         let name_iter = self.name_set.difference(&to.name_set);
         NameIteration {
             iter: name_iter,
@@ -137,7 +137,7 @@ impl<T: PartialEq + Eq + Hash> FactSet<T> {
     pub fn changed_facts<'to>(
         &'to self,
         to: &'to Self,
-    ) -> ChangedIterator<'to, T, impl Iterator<Item = &String>> {
+    ) -> ChangedIterator<'to, T, impl Iterator<Item = &'to String>> {
         let name_iter = self.backing.keys();
         ChangedIterator {
             iter: name_iter,
