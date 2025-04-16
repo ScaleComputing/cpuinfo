@@ -114,7 +114,7 @@ pub struct MSRValue<'a> {
     pub value: u64,
 }
 
-impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for MSRValue<'a> {
+impl<T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>> for MSRValue<'_> {
     fn collect_facts(&self) -> Vec<GenericFact<T>> {
         let value = self.value.into();
         self.desc
@@ -130,7 +130,7 @@ impl<'a, T: From<u32> + From<bool> + From<String>> facts::Facter<GenericFact<T>>
     }
 }
 
-impl<'a> fmt::Display for MSRValue<'a> {
+impl fmt::Display for MSRValue<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "{} = {:#x}", self.desc, self.value)?;
         for field in &self.desc.fields {
