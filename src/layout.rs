@@ -293,7 +293,7 @@ impl LeafDesc {
         &self.data_type
     }
 
-    pub fn bind_leaf<CPUIDFunc: CpuidDB>(&self, leaf: u32, cpuid: &CPUIDFunc) -> Option<BoundLeaf> {
+    pub fn bind_leaf<CPUIDFunc: CpuidDB>(&self, leaf: u32, cpuid: &CPUIDFunc) -> Option<BoundLeaf<'_>> {
         let sub_leaves = self.scan_sub_leaves(leaf, cpuid);
         if !sub_leaves.is_empty() {
             Some(BoundLeaf {
