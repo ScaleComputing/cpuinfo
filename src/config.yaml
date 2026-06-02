@@ -155,6 +155,15 @@ cpuids:
     name: "Brand String 3"
     data_type:
       type: String
+  0x80000008:
+    name: "Address Sizes and Extended Features"
+    data_type:
+      type: BitField
+      eax: []
+      ebx:
+        - {type: Flag, name: "WBNOINVD", bit: 9}
+      ecx: []
+      edx: []
 msrs:
   - name: "Core_Capabilities"
     address: 0xCF
