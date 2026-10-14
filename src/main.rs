@@ -16,8 +16,8 @@ use std::error::Error;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-type YAMLFact = GenericFact<serde_yaml::Value>;
-type YAMLFactSet = FactSet<serde_yaml::Value>;
+type JsonFact = GenericFact<serde_json::Value>;
+type JsonFactSet = FactSet<serde_json::Value>;
 
 #[enum_dispatch()]
 trait Command {
@@ -132,7 +132,6 @@ impl Command for Disp {
 
 #[derive(Clone, PartialEq, Eq, ValueEnum)]
 enum FactsOutput {
-    Yaml,
     Json,
 }
 
@@ -143,7 +142,7 @@ struct Facts {
     #[cfg(all(target_os = "linux", feature = "kvm"))]
     #[arg(short, long)]
     use_kvm: bool,
-    #[arg(short, long, value_enum, default_value = "yaml")]
+    #[arg(short, long, value_enum, default_value = "json")]
     out_type: FactsOutput,
 }
 
@@ -151,8 +150,8 @@ fn collect_facts(
     config: &Definition,
     cpuid_selected: CpuidType,
     msr_store: Box<dyn MsrStore>,
-) -> Result<Vec<YAMLFact>, Box<dyn std::error::Error>> {
-    let mut ret: Vec<YAMLFact> = config
+) -> Result<Vec<JsonFact>, Box<dyn std::error::Error>> {
+    let mut ret: Vec<JsonFact> = config
         .cpuids
         .iter()
         .filter_map(|(leaf, desc)| desc.bind_leaf(*leaf, &cpuid_selected))
@@ -237,7 +236,6 @@ impl Command for Facts {
         println!(
             "{}",
             match self.out_type {
-                FactsOutput::Yaml => serde_yaml::to_string(&facts)?,
                 FactsOutput::Json => serde_json::to_string(&facts)?,
             }
         );
@@ -245,16 +243,16 @@ impl Command for Facts {
     }
 }
 
-fn read_facts_from_file(fname: &str) -> Result<Vec<YAMLFact>, Box<dyn Error>> {
+fn read_facts_from_file(fname: &str) -> Result<Vec<JsonFact>, Box<dyn Error>> {
     let file = std::fs::File::open(fname)?;
-    Ok(serde_yaml::from_reader(file)?)
+    Ok(serde_json::from_reader(file)?)
 }
 
 #[derive(Serialize, Debug)]
 struct DiffOutput {
-    added: Vec<YAMLFact>,
-    removed: Vec<YAMLFact>,
-    changed: Vec<(YAMLFact, YAMLFact)>,
+    added: Vec<JsonFact>,
+    removed: Vec<JsonFact>,
+    changed: Vec<(JsonFact, JsonFact)>,
 }
 
 impl DiffOutput {
@@ -276,7 +274,7 @@ impl DiffFoundError {
 
 impl fmt::Display for DiffFoundError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let as_yaml = serde_yaml::to_string(&self.inner).map_err(|_| std::fmt::Error {})?;
+        let as_yaml = serde_json::to_string(&self.inner).map_err(|_| std::fmt::Error {})?;
         write!(f, "{}", as_yaml)
     }
 }
@@ -293,8 +291,8 @@ struct Diff {
 
 impl Command for Diff {
     fn run(&self, _config: &Definition) -> Result<(), Box<dyn Error>> {
-        let from: YAMLFactSet = read_facts_from_file(&self.from_file_name)?.into();
-        let to: YAMLFactSet = read_facts_from_file(&self.to_file_name)?.into();
+        let from: JsonFactSet = read_facts_from_file(&self.from_file_name)?.into();
+        let to: JsonFactSet = read_facts_from_file(&self.to_file_name)?.into();
 
         let output = DiffOutput {
             added: from.added_facts(&to).map(Clone::clone).collect(),
@@ -307,11 +305,11 @@ impl Command for Diff {
 
         if output.is_empty() {
             if self.verbose {
-                println!("{}", serde_yaml::to_string(&output)?);
+                println!("{}", serde_json::to_string(&output)?);
             }
             Ok(())
         } else {
-            println!("{}", serde_yaml::to_string(&output)?);
+            println!("{}", serde_json::to_string(&output)?);
             Err(DiffFoundError::new(output).into())
         }
     }
@@ -335,8 +333,8 @@ impl Definition {
 }
 
 fn find_read_config() -> Result<Definition, Box<dyn std::error::Error>> {
-    let file = include_str!("config.yaml");
-    Ok(serde_yaml::from_str(file)?)
+    let file = include_str!("config.json");
+    Ok(serde_json::from_str(file)?)
 }
 
 fn display_raw() -> Result<(), Box<dyn std::error::Error>> {
@@ -369,7 +367,7 @@ where
 {
     for path in paths {
         let file = std::fs::read(path)?;
-        let definition = serde_yaml::from_slice(&file)?;
+        let definition = serde_json::from_slice(&file)?;
         def.union(definition);
     }
     Ok(())
