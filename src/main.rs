@@ -317,6 +317,7 @@ impl Command for Diff {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Definition {
+    #[serde(with = "cpuinfo::hex::u32_map")]
     pub cpuids: BTreeMap<u32, LeafDesc>,
     pub msrs: Vec<MSRDesc>,
 }
@@ -388,4 +389,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     read_additional_configs(&mut config, args.add_config.iter())?;
 
     args.command.run(&config)
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn builtin_config_parses() {
+        let config = super::find_read_config().expect("src/config.json must parse");
+        assert!(config.cpuids.contains_key(&0x8000_0008));
+        assert!(config.msrs.iter().any(|msr| msr.address == 0x10a));
+    }
 }
