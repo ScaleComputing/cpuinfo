@@ -3,6 +3,7 @@ use enum_dispatch::enum_dispatch;
 
 pub mod bitfield;
 pub mod facts;
+pub mod hex;
 pub mod layout;
 pub mod msr;
 

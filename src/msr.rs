@@ -99,6 +99,7 @@ pub mod linux {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MSRDesc {
     pub name: String,
+    #[serde(with = "crate::hex::u32")]
     pub address: u32,
     pub fields: Vec<bitfield::Field>,
 }

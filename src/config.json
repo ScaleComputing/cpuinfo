@@ -163,7 +163,7 @@
         ]
       }
     },
-    "13": {
+    "0xd": {
       "name": "Processor Extended State Enumeration",
       "data_type": {
         "type": "SubLeafBitField",
@@ -260,19 +260,19 @@
         ]
       }
     },
-    "1073741824": {
+    "0x40000000": {
       "name": "Hypervisor ID",
       "data_type": {
         "type": "Start"
       }
     },
-    "1073741825": {
+    "0x40000001": {
       "name": "Hypervisor Vendor-Neutral ID",
       "data_type": {
         "type": "String"
       }
     },
-    "1073741826": {
+    "0x40000002": {
       "name": "Hypervisor System ID",
       "data_type": {
         "type": "BitField",
@@ -308,7 +308,7 @@
         "edx": []
       }
     },
-    "1073741827": {
+    "0x40000003": {
       "name": "Hypervisor Feature ID",
       "data_type": {
         "type": "BitField",
@@ -473,7 +473,7 @@
         ]
       }
     },
-    "1073741829": {
+    "0x40000005": {
       "name": "Hypervisor Feature ID",
       "data_type": {
         "type": "BitField",
@@ -510,25 +510,25 @@
         "edx": []
       }
     },
-    "2147483650": {
+    "0x80000002": {
       "name": "Brand String 1",
       "data_type": {
         "type": "String"
       }
     },
-    "2147483651": {
+    "0x80000003": {
       "name": "Brand String 2",
       "data_type": {
         "type": "String"
       }
     },
-    "2147483652": {
+    "0x80000004": {
       "name": "Brand String 3",
       "data_type": {
         "type": "String"
       }
     },
-    "2147483656": {
+    "0x80000008": {
       "name": "Address Sizes and Extended Features",
       "data_type": {
         "type": "BitField",
@@ -548,7 +548,7 @@
   "msrs": [
     {
       "name": "Platform ID",
-      "address": 23,
+      "address": "0x17",
       "fields": [
         {
           "type": "Int",
@@ -562,7 +562,7 @@
     },
     {
       "name": "Core_Capabilities",
-      "address": 207,
+      "address": "0xcf",
       "fields": [
         {
           "type": "Flag",
@@ -573,7 +573,7 @@
     },
     {
       "name": "Arch Capabilities",
-      "address": 266,
+      "address": "0x10a",
       "fields": [
         {
           "type": "Flag",
@@ -634,7 +634,7 @@
     },
     {
       "name": "Microcode Update Option Control",
-      "address": 291,
+      "address": "0x123",
       "fields": [
         {
           "type": "Flag",
@@ -650,7 +650,7 @@
     },
     {
       "name": "Perf_Capabilities",
-      "address": 837,
+      "address": "0x345",
       "fields": [
         {
           "type": "Int",
@@ -707,7 +707,7 @@
     },
     {
       "name": "Basic VMX",
-      "address": 1152,
+      "address": "0x480",
       "fields": [
         {
           "type": "Int",
@@ -739,7 +739,7 @@
     },
     {
       "name": "VMX: Pin-based Ctls",
-      "address": 1153,
+      "address": "0x481",
       "fields": [
         {
           "type": "Flag",
@@ -770,7 +770,7 @@
     },
     {
       "name": "VMX: True Pin-based Ctls",
-      "address": 1165,
+      "address": "0x48d",
       "fields": [
         {
           "type": "Flag",
@@ -801,7 +801,7 @@
     },
     {
       "name": "VMX: Proccessor Based Ctls - Most",
-      "address": 1154,
+      "address": "0x482",
       "fields": [
         {
           "type": "Flag",
@@ -917,7 +917,7 @@
     },
     {
       "name": "VMX: Proccessor Based Ctls - All",
-      "address": 1166,
+      "address": "0x48e",
       "fields": [
         {
           "type": "Flag",
@@ -1033,7 +1033,7 @@
     },
     {
       "name": "VMX: Proccessor Based Ctls 2",
-      "address": 1163,
+      "address": "0x48b",
       "fields": [
         {
           "type": "Flag",
@@ -1179,7 +1179,7 @@
     },
     {
       "name": "VMX: Proccessor Based Ctls 3",
-      "address": 1170,
+      "address": "0x492",
       "fields": [
         {
           "type": "Flag",
