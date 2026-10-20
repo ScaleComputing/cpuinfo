@@ -1,13 +1,13 @@
 {
   "cpuids": {
     "0": {
-      "name": "Start",
+      "name": "max-leaf-vendor",
       "data_type": {
         "type": "Start"
       }
     },
     "1": {
-      "name": "Model",
+      "name": "version-features",
       "data_type": {
         "type": "BitField",
         "eax": [
@@ -30,29 +30,205 @@
               "start": 8,
               "end": 11
             }
+          },
+          {
+            "type": "Int",
+            "name": "processor-type",
+            "bounds": {
+              "start": 12,
+              "end": 14
+            }
           }
         ],
-        "ebx": [],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "brand-index",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Int",
+            "name": "clflush-line-size",
+            "bounds": {
+              "start": 8,
+              "end": 16
+            }
+          },
+          {
+            "type": "Int",
+            "name": "apic-id-space",
+            "bounds": {
+              "start": 16,
+              "end": 24
+            }
+          },
+          {
+            "type": "Int",
+            "name": "initial-apic-id",
+            "bounds": {
+              "start": 24,
+              "end": 32
+            }
+          }
+        ],
         "ecx": [
           {
             "type": "Flag",
-            "name": "SSE3",
+            "name": "pni",
             "bit": 0
           },
           {
             "type": "Flag",
-            "name": "VMX",
+            "name": "pclmulqdq",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "dtes64",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "monitor",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "ds-cpl",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "vmx",
             "bit": 5
           },
           {
             "type": "Flag",
-            "name": "x2APIC",
+            "name": "smx",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "est",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "tm2",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "ssse3",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "cid",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "debug-interface",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "fma",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "cx16",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "xtpr",
+            "bit": 14
+          },
+          {
+            "type": "Flag",
+            "name": "pdcm",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "pcid",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "dca",
+            "bit": 18
+          },
+          {
+            "type": "Flag",
+            "name": "sse4-1",
+            "bit": 19
+          },
+          {
+            "type": "Flag",
+            "name": "sse4-2",
+            "bit": 20
+          },
+          {
+            "type": "Flag",
+            "name": "x2apic",
             "bit": 21
           },
           {
             "type": "Flag",
-            "name": "AESNI",
+            "name": "movbe",
+            "bit": 22
+          },
+          {
+            "type": "Flag",
+            "name": "popcnt",
+            "bit": 23
+          },
+          {
+            "type": "Flag",
+            "name": "tsc-deadline",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "aes",
             "bit": 25
+          },
+          {
+            "type": "Flag",
+            "name": "xsave",
+            "bit": 26
+          },
+          {
+            "type": "Flag",
+            "name": "osxsave",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "avx",
+            "bit": 28
+          },
+          {
+            "type": "Flag",
+            "name": "f16c",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "rdrand",
+            "bit": 30
+          },
+          {
+            "type": "Flag",
+            "name": "hypervisor",
+            "bit": 31
           }
         ],
         "edx": [
@@ -64,13 +240,317 @@
           {
             "type": "Flag",
             "name": "vme",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "de",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "pse",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "tsc",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "msr",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "pae",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "mce",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "cx8",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "apic",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "sep",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "mtrr",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "pge",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "mca",
+            "bit": 14
+          },
+          {
+            "type": "Flag",
+            "name": "cmov",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "pat",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "pse36",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "pn",
+            "bit": 18
+          },
+          {
+            "type": "Flag",
+            "name": "clflush",
+            "bit": 19
+          },
+          {
+            "type": "Flag",
+            "name": "ds",
+            "bit": 21
+          },
+          {
+            "type": "Flag",
+            "name": "acpi",
+            "bit": 22
+          },
+          {
+            "type": "Flag",
+            "name": "mmx",
+            "bit": 23
+          },
+          {
+            "type": "Flag",
+            "name": "fxsr",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "sse",
+            "bit": 25
+          },
+          {
+            "type": "Flag",
+            "name": "sse2",
+            "bit": 26
+          },
+          {
+            "type": "Flag",
+            "name": "ss",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "ht",
+            "bit": 28
+          },
+          {
+            "type": "Flag",
+            "name": "tm",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "pbe",
+            "bit": 31
+          }
+        ]
+      }
+    },
+    "6": {
+      "name": "thermal-power-management",
+      "data_type": {
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Flag",
+            "name": "digital-temp-sensor",
             "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "turbo-boost",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "arat",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "power-limit-notify",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "ext-clock-mod",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "pkg-therm-mgmt",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "hwp",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-interrupt",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-activity-window",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-epp",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-request-pkg",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "hdc",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "turbo-boost-max",
+            "bit": 14
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-cap",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-peci-override",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "flexible-hwp",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-request-fast-access",
+            "bit": 18
+          },
+          {
+            "type": "Flag",
+            "name": "hw-feedback",
+            "bit": 19
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-request-ignore-idle",
+            "bit": 20
+          },
+          {
+            "type": "Flag",
+            "name": "hwp-ctl",
+            "bit": 22
+          },
+          {
+            "type": "Flag",
+            "name": "thread-director",
+            "bit": 23
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "dts-num-int-thresholds",
+            "bounds": {
+              "start": 0,
+              "end": 4
+            }
+          }
+        ],
+        "ecx": [
+          {
+            "type": "Flag",
+            "name": "hw-feedback-cap",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "energy-perf-bias",
+            "bit": 3
+          },
+          {
+            "type": "Int",
+            "name": "hw-feedback-num-classes",
+            "bounds": {
+              "start": 8,
+              "end": 16
+            }
+          }
+        ],
+        "edx": [
+          {
+            "type": "Int",
+            "name": "hw-feedback-caps",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Int",
+            "name": "hw-feedback-table-size",
+            "bounds": {
+              "start": 8,
+              "end": 12
+            }
+          },
+          {
+            "type": "Int",
+            "name": "hw-feedback-table-index",
+            "bounds": {
+              "start": 16,
+              "end": 32
+            }
           }
         ]
       }
     },
     "7": {
-      "name": "Structured Extened Flags",
+      "name": "structured-extended-features",
       "data_type": {
         "type": "SubLeafBitField",
         "leaves": [
@@ -78,7 +558,7 @@
             "eax": [
               {
                 "type": "Int",
-                "name": "Sub-Leaf Count",
+                "name": "max-subleaf",
                 "bounds": {
                   "start": 0,
                   "end": 31
@@ -88,51 +568,425 @@
             "ebx": [
               {
                 "type": "Flag",
-                "name": "HLE",
+                "name": "fsgsbase",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "tsc-adjust",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "sgx",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "bmi1",
+                "bit": 3
+              },
+              {
+                "type": "Flag",
+                "name": "hle",
                 "bit": 4
               },
               {
                 "type": "Flag",
-                "name": "RTM",
-                "bit": 11
+                "name": "avx2",
+                "bit": 5
               },
               {
                 "type": "Flag",
-                "name": "MPX",
-                "bit": 14
+                "name": "fdp-excptn-only",
+                "bit": 6
               },
               {
                 "type": "Flag",
-                "name": "PT",
-                "bit": 25
-              }
-            ],
-            "ecx": [],
-            "edx": [
+                "name": "smep",
+                "bit": 7
+              },
               {
                 "type": "Flag",
-                "name": "AVX512 VP2Intersect",
+                "name": "bmi2",
                 "bit": 8
               },
               {
                 "type": "Flag",
-                "name": "RTM Always Abort",
+                "name": "erms",
+                "bit": 9
+              },
+              {
+                "type": "Flag",
+                "name": "invpcid",
+                "bit": 10
+              },
+              {
+                "type": "Flag",
+                "name": "rtm",
                 "bit": 11
               },
               {
                 "type": "Flag",
-                "name": "RTM Force Abort",
+                "name": "rdt-m",
+                "bit": 12
+              },
+              {
+                "type": "Flag",
+                "name": "zero-fcs-fds",
                 "bit": 13
               },
               {
                 "type": "Flag",
-                "name": "Arch_Capabilities",
+                "name": "mpx",
+                "bit": 14
+              },
+              {
+                "type": "Flag",
+                "name": "rdt-a",
+                "bit": 15
+              },
+              {
+                "type": "Flag",
+                "name": "avx512f",
+                "bit": 16
+              },
+              {
+                "type": "Flag",
+                "name": "avx512dq",
+                "bit": 17
+              },
+              {
+                "type": "Flag",
+                "name": "rdseed",
+                "bit": 18
+              },
+              {
+                "type": "Flag",
+                "name": "adx",
+                "bit": 19
+              },
+              {
+                "type": "Flag",
+                "name": "smap",
+                "bit": 20
+              },
+              {
+                "type": "Flag",
+                "name": "avx512ifma",
+                "bit": 21
+              },
+              {
+                "type": "Flag",
+                "name": "clflushopt",
+                "bit": 23
+              },
+              {
+                "type": "Flag",
+                "name": "clwb",
+                "bit": 24
+              },
+              {
+                "type": "Flag",
+                "name": "intel-pt",
+                "bit": 25
+              },
+              {
+                "type": "Flag",
+                "name": "avx512pf",
+                "bit": 26
+              },
+              {
+                "type": "Flag",
+                "name": "avx512er",
+                "bit": 27
+              },
+              {
+                "type": "Flag",
+                "name": "avx512cd",
+                "bit": 28
+              },
+              {
+                "type": "Flag",
+                "name": "sha-ni",
                 "bit": 29
               },
               {
                 "type": "Flag",
-                "name": "Core_Capabilities",
+                "name": "avx512bw",
                 "bit": 30
+              },
+              {
+                "type": "Flag",
+                "name": "avx512vl",
+                "bit": 31
+              }
+            ],
+            "ecx": [
+              {
+                "type": "Flag",
+                "name": "prefetchwt1",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "avx512vbmi",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "umip",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "pku",
+                "bit": 3
+              },
+              {
+                "type": "Flag",
+                "name": "ospke",
+                "bit": 4
+              },
+              {
+                "type": "Flag",
+                "name": "waitpkg",
+                "bit": 5
+              },
+              {
+                "type": "Flag",
+                "name": "avx512vbmi2",
+                "bit": 6
+              },
+              {
+                "type": "Flag",
+                "name": "cet-ss",
+                "bit": 7
+              },
+              {
+                "type": "Flag",
+                "name": "gfni",
+                "bit": 8
+              },
+              {
+                "type": "Flag",
+                "name": "vaes",
+                "bit": 9
+              },
+              {
+                "type": "Flag",
+                "name": "vpclmulqdq",
+                "bit": 10
+              },
+              {
+                "type": "Flag",
+                "name": "avx512vnni",
+                "bit": 11
+              },
+              {
+                "type": "Flag",
+                "name": "avx512bitalg",
+                "bit": 12
+              },
+              {
+                "type": "Flag",
+                "name": "tme-en",
+                "bit": 13
+              },
+              {
+                "type": "Flag",
+                "name": "avx512-vpopcntdq",
+                "bit": 14
+              },
+              {
+                "type": "Flag",
+                "name": "la57",
+                "bit": 16
+              },
+              {
+                "type": "Int",
+                "name": "mpx-mawau",
+                "bounds": {
+                  "start": 17,
+                  "end": 22
+                }
+              },
+              {
+                "type": "Flag",
+                "name": "rdpid",
+                "bit": 22
+              },
+              {
+                "type": "Flag",
+                "name": "key-locker",
+                "bit": 23
+              },
+              {
+                "type": "Flag",
+                "name": "bus-lock-detect",
+                "bit": 24
+              },
+              {
+                "type": "Flag",
+                "name": "cldemote",
+                "bit": 25
+              },
+              {
+                "type": "Flag",
+                "name": "movdiri",
+                "bit": 27
+              },
+              {
+                "type": "Flag",
+                "name": "movdir64b",
+                "bit": 28
+              },
+              {
+                "type": "Flag",
+                "name": "enqcmd",
+                "bit": 29
+              },
+              {
+                "type": "Flag",
+                "name": "sgxlc",
+                "bit": 30
+              },
+              {
+                "type": "Flag",
+                "name": "pks",
+                "bit": 31
+              }
+            ],
+            "edx": [
+              {
+                "type": "Flag",
+                "name": "sgx-keys",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "avx512-4vnniw",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "avx512-4fmaps",
+                "bit": 3
+              },
+              {
+                "type": "Flag",
+                "name": "fsrm",
+                "bit": 4
+              },
+              {
+                "type": "Flag",
+                "name": "uintr",
+                "bit": 5
+              },
+              {
+                "type": "Flag",
+                "name": "avx512-vp2intersect",
+                "bit": 8
+              },
+              {
+                "type": "Flag",
+                "name": "mcu-opt-ctrl",
+                "bit": 9
+              },
+              {
+                "type": "Flag",
+                "name": "md-clear",
+                "bit": 10
+              },
+              {
+                "type": "Flag",
+                "name": "rtm-always-abort",
+                "bit": 11
+              },
+              {
+                "type": "Flag",
+                "name": "rtm-force-abort",
+                "bit": 13
+              },
+              {
+                "type": "Flag",
+                "name": "serialize",
+                "bit": 14
+              },
+              {
+                "type": "Flag",
+                "name": "hybrid",
+                "bit": 15
+              },
+              {
+                "type": "Flag",
+                "name": "tsx-ldtrk",
+                "bit": 16
+              },
+              {
+                "type": "Flag",
+                "name": "pconfig",
+                "bit": 18
+              },
+              {
+                "type": "Flag",
+                "name": "arch-lbr",
+                "bit": 19
+              },
+              {
+                "type": "Flag",
+                "name": "cet-ibt",
+                "bit": 20
+              },
+              {
+                "type": "Flag",
+                "name": "amx-bf16",
+                "bit": 22
+              },
+              {
+                "type": "Flag",
+                "name": "avx512-fp16",
+                "bit": 23
+              },
+              {
+                "type": "Flag",
+                "name": "amx-tile",
+                "bit": 24
+              },
+              {
+                "type": "Flag",
+                "name": "amx-int8",
+                "bit": 25
+              },
+              {
+                "type": "Flag",
+                "name": "spec-ctrl",
+                "bit": 26
+              },
+              {
+                "type": "Flag",
+                "name": "stibp",
+                "bit": 27
+              },
+              {
+                "type": "Flag",
+                "name": "flush-l1d",
+                "bit": 28
+              },
+              {
+                "type": "Flag",
+                "name": "arch-capabilities",
+                "bit": 29
+              },
+              {
+                "type": "Flag",
+                "name": "core-capability",
+                "bit": 30
+              },
+              {
+                "type": "Flag",
+                "name": "ssbd",
+                "bit": 31
               }
             ]
           },
@@ -140,13 +994,206 @@
             "eax": [
               {
                 "type": "Flag",
-                "name": "AVX VNNI",
-                "bit": 14
+                "name": "sha512",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "sm3",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "sm4",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "avx-vnni",
+                "bit": 4
+              },
+              {
+                "type": "Flag",
+                "name": "avx512-bf16",
+                "bit": 5
+              },
+              {
+                "type": "Flag",
+                "name": "lass",
+                "bit": 6
+              },
+              {
+                "type": "Flag",
+                "name": "cmpccxadd",
+                "bit": 7
+              },
+              {
+                "type": "Flag",
+                "name": "arch-perfmon-ext",
+                "bit": 8
+              },
+              {
+                "type": "Flag",
+                "name": "fzrm",
+                "bit": 10
+              },
+              {
+                "type": "Flag",
+                "name": "fsrs",
+                "bit": 11
+              },
+              {
+                "type": "Flag",
+                "name": "fsrc",
+                "bit": 12
+              },
+              {
+                "type": "Flag",
+                "name": "fred",
+                "bit": 17
+              },
+              {
+                "type": "Flag",
+                "name": "lkgs",
+                "bit": 18
+              },
+              {
+                "type": "Flag",
+                "name": "wrmsrns",
+                "bit": 19
+              },
+              {
+                "type": "Flag",
+                "name": "nmi-src",
+                "bit": 20
+              },
+              {
+                "type": "Flag",
+                "name": "amx-fp16",
+                "bit": 21
+              },
+              {
+                "type": "Flag",
+                "name": "hreset",
+                "bit": 22
+              },
+              {
+                "type": "Flag",
+                "name": "avx-ifma",
+                "bit": 23
+              },
+              {
+                "type": "Flag",
+                "name": "lam",
+                "bit": 26
+              },
+              {
+                "type": "Flag",
+                "name": "msrlist",
+                "bit": 27
+              },
+              {
+                "type": "Flag",
+                "name": "invd-disable-post-bios-done",
+                "bit": 30
               }
             ],
-            "ebx": [],
-            "ecx": [],
-            "edx": []
+            "ebx": [
+              {
+                "type": "Flag",
+                "name": "ppin",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "pbndkb",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "cpuidmaxval-lim-rmv",
+                "bit": 3
+              }
+            ],
+            "ecx": [
+              {
+                "type": "Flag",
+                "name": "rdt-m-asym",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "rdt-a-asym",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "msr-imm",
+                "bit": 5
+              }
+            ],
+            "edx": [
+              {
+                "type": "Flag",
+                "name": "avx-vnni-int8",
+                "bit": 4
+              },
+              {
+                "type": "Flag",
+                "name": "avx-ne-convert",
+                "bit": 5
+              },
+              {
+                "type": "Flag",
+                "name": "amx-complex",
+                "bit": 8
+              },
+              {
+                "type": "Flag",
+                "name": "avx-vnni-int16",
+                "bit": 10
+              },
+              {
+                "type": "Flag",
+                "name": "prefetchiti",
+                "bit": 14
+              },
+              {
+                "type": "Flag",
+                "name": "user-msr",
+                "bit": 15
+              },
+              {
+                "type": "Flag",
+                "name": "uiret-uif",
+                "bit": 17
+              },
+              {
+                "type": "Flag",
+                "name": "cet-sss",
+                "bit": 18
+              },
+              {
+                "type": "Flag",
+                "name": "avx10",
+                "bit": 19
+              },
+              {
+                "type": "Flag",
+                "name": "sec-tee-attestation",
+                "bit": 22
+              },
+              {
+                "type": "Flag",
+                "name": "mwait",
+                "bit": 23
+              },
+              {
+                "type": "Flag",
+                "name": "slsm",
+                "bit": 24
+              }
+            ]
           },
           {
             "eax": [],
@@ -155,8 +1202,43 @@
             "edx": [
               {
                 "type": "Flag",
-                "name": "PSFD",
+                "name": "intel-psfd",
                 "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "ipred-ctrl",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "rrsba-ctrl",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "ddpd-u",
+                "bit": 3
+              },
+              {
+                "type": "Flag",
+                "name": "bhi-ctrl",
+                "bit": 4
+              },
+              {
+                "type": "Flag",
+                "name": "mcdt-no",
+                "bit": 5
+              },
+              {
+                "type": "Flag",
+                "name": "uc-lock-disable",
+                "bit": 6
+              },
+              {
+                "type": "Flag",
+                "name": "monitor-mitg-no",
+                "bit": 7
               }
             ]
           }
@@ -164,7 +1246,7 @@
       }
     },
     "0xd": {
-      "name": "Processor Extended State Enumeration",
+      "name": "extended-state",
       "data_type": {
         "type": "SubLeafBitField",
         "leaves": [
@@ -172,52 +1254,52 @@
             "eax": [
               {
                 "type": "Flag",
-                "name": "X87 State",
+                "name": "x87-state",
                 "bit": 0
               },
               {
                 "type": "Flag",
-                "name": "SSE State",
+                "name": "sse-state",
                 "bit": 1
               },
               {
                 "type": "Flag",
-                "name": "AVX State",
+                "name": "avx-state",
                 "bit": 2
               },
               {
                 "type": "Flag",
-                "name": "BNDREGS State",
+                "name": "bndregs-state",
                 "bit": 3
               },
               {
                 "type": "Flag",
-                "name": "BNDCSR State",
+                "name": "bndcsr-state",
                 "bit": 4
               },
               {
                 "type": "Flag",
-                "name": "OPMASK State",
+                "name": "opmask-state",
                 "bit": 5
               },
               {
                 "type": "Flag",
-                "name": "ZMM_Hi256 State",
+                "name": "zmm-hi256-state",
                 "bit": 6
               },
               {
                 "type": "Flag",
-                "name": "Hi16_ZMM State",
+                "name": "hi16-zmm-state",
                 "bit": 7
               },
               {
                 "type": "Flag",
-                "name": "IA32_XSS State",
+                "name": "ia32-xss-state",
                 "bit": 8
               },
               {
                 "type": "Flag",
-                "name": "PKRU State",
+                "name": "pkru-state",
                 "bit": 9
               }
             ],
@@ -229,27 +1311,27 @@
             "eax": [
               {
                 "type": "Flag",
-                "name": "XSAVEOPT",
+                "name": "xsaveopt",
                 "bit": 0
               },
               {
                 "type": "Flag",
-                "name": "XSAVEC",
+                "name": "xsavec",
                 "bit": 1
               },
               {
                 "type": "Flag",
-                "name": "XGETBV with ECX=1",
+                "name": "xgetbv1",
                 "bit": 2
               },
               {
                 "type": "Flag",
-                "name": "XSAVES",
+                "name": "xsaves",
                 "bit": 3
               },
               {
                 "type": "Flag",
-                "name": "Extended Feature Disable(XFD)",
+                "name": "xfd",
                 "bit": 4
               }
             ],
@@ -260,26 +1342,319 @@
         ]
       }
     },
-    "0x40000000": {
-      "name": "Hypervisor ID",
+    "0x12": {
+      "name": "sgx-capability",
       "data_type": {
-        "type": "Start"
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Flag",
+            "name": "sgx1",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "sgx2",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "everifyreport2",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "eupdatesvn",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "sgx-edeccssa",
+            "bit": 11
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Flag",
+            "name": "sgx-exinfo",
+            "bit": 0
+          }
+        ],
+        "ecx": [],
+        "edx": [
+          {
+            "type": "Int",
+            "name": "max-enclave-size-not64",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Int",
+            "name": "max-enclave-size-64",
+            "bounds": {
+              "start": 8,
+              "end": 16
+            }
+          }
+        ]
       }
     },
-    "0x40000001": {
-      "name": "Hypervisor Vendor-Neutral ID",
+    "0x14": {
+      "name": "processor-trace",
       "data_type": {
-        "type": "String"
+        "type": "SubLeafBitField",
+        "leaves": [
+          {
+            "eax": [
+              {
+                "type": "Int",
+                "name": "max-subleaf",
+                "bounds": {
+                  "start": 0,
+                  "end": 32
+                }
+              }
+            ],
+            "ebx": [
+              {
+                "type": "Flag",
+                "name": "cr3-filter",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "cyc-acc",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "ip-filter",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "mtc",
+                "bit": 3
+              },
+              {
+                "type": "Flag",
+                "name": "ptwrite",
+                "bit": 4
+              },
+              {
+                "type": "Flag",
+                "name": "pwr-evt-trace",
+                "bit": 5
+              },
+              {
+                "type": "Flag",
+                "name": "pmi-preserve",
+                "bit": 6
+              },
+              {
+                "type": "Flag",
+                "name": "event-trace",
+                "bit": 7
+              },
+              {
+                "type": "Flag",
+                "name": "tnt-dis",
+                "bit": 8
+              },
+              {
+                "type": "Flag",
+                "name": "pttt",
+                "bit": 9
+              }
+            ],
+            "ecx": [
+              {
+                "type": "Flag",
+                "name": "topaout",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "mentry",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "sngl-rng-out",
+                "bit": 2
+              },
+              {
+                "type": "Flag",
+                "name": "trace-transport-subsystem",
+                "bit": 3
+              },
+              {
+                "type": "Flag",
+                "name": "intel-pt-lip",
+                "bit": 31
+              }
+            ],
+            "edx": []
+          },
+          {
+            "eax": [
+              {
+                "type": "Int",
+                "name": "rangecnt",
+                "bounds": {
+                  "start": 0,
+                  "end": 3
+                }
+              },
+              {
+                "type": "Int",
+                "name": "trigger-cfg-cnt",
+                "bounds": {
+                  "start": 8,
+                  "end": 11
+                }
+              },
+              {
+                "type": "Int",
+                "name": "mtc-rate",
+                "bounds": {
+                  "start": 16,
+                  "end": 32
+                }
+              }
+            ],
+            "ebx": [
+              {
+                "type": "Int",
+                "name": "cyc-thresholds",
+                "bounds": {
+                  "start": 0,
+                  "end": 16
+                }
+              },
+              {
+                "type": "Int",
+                "name": "psb-rate",
+                "bounds": {
+                  "start": 16,
+                  "end": 32
+                }
+              }
+            ],
+            "ecx": [
+              {
+                "type": "Flag",
+                "name": "icnt",
+                "bit": 0
+              },
+              {
+                "type": "Flag",
+                "name": "trigger-pause",
+                "bit": 1
+              },
+              {
+                "type": "Flag",
+                "name": "trigger-dr-match",
+                "bit": 15
+              }
+            ],
+            "edx": []
+          }
+        ]
       }
     },
-    "0x40000002": {
-      "name": "Hypervisor System ID",
+    "0x1e": {
+      "name": "tmul-information",
+      "data_type": {
+        "type": "BitField",
+        "eax": [],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "tmul-maxk",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Int",
+            "name": "tmul-maxn",
+            "bounds": {
+              "start": 8,
+              "end": 24
+            }
+          }
+        ],
+        "ecx": [],
+        "edx": []
+      }
+    },
+    "0x24": {
+      "name": "converged-vector-isa",
       "data_type": {
         "type": "BitField",
         "eax": [
           {
             "type": "Int",
-            "name": "Build Number",
+            "name": "max-subleaf",
+            "bounds": {
+              "start": 0,
+              "end": 32
+            }
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "avx10-version",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Flag",
+            "name": "avx10-128",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "avx10-256",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "avx10-512",
+            "bit": 18
+          }
+        ],
+        "ecx": [],
+        "edx": []
+      }
+    },
+    "0x40000000": {
+      "name": "hypervisor-max-leaf-vendor",
+      "data_type": {
+        "type": "Start"
+      }
+    },
+    "0x40000001": {
+      "name": "hypervisor-interface",
+      "data_type": {
+        "type": "String"
+      }
+    },
+    "0x40000002": {
+      "name": "hypervisor-version",
+      "data_type": {
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Int",
+            "name": "build-number",
             "bounds": {
               "start": 0,
               "end": 31
@@ -289,7 +1664,7 @@
         "ebx": [
           {
             "type": "Int",
-            "name": "Major",
+            "name": "major",
             "bounds": {
               "start": 16,
               "end": 31
@@ -297,7 +1672,7 @@
           },
           {
             "type": "Int",
-            "name": "Minor",
+            "name": "minor",
             "bounds": {
               "start": 0,
               "end": 15
@@ -309,13 +1684,13 @@
       }
     },
     "0x40000003": {
-      "name": "Hypervisor Feature ID",
+      "name": "hypervisor-features",
       "data_type": {
         "type": "BitField",
         "eax": [
           {
             "type": "Int",
-            "name": "Privilege Mask Low",
+            "name": "privilege-mask-low",
             "bounds": {
               "start": 0,
               "end": 31
@@ -325,7 +1700,7 @@
         "ebx": [
           {
             "type": "Int",
-            "name": "Privilege Mask High",
+            "name": "privilege-mask-high",
             "bounds": {
               "start": 0,
               "end": 31
@@ -335,152 +1710,152 @@
         "ecx": [
           {
             "type": "Flag",
-            "name": "Mperf",
+            "name": "mperf",
             "bit": 5
           },
           {
             "type": "Flag",
-            "name": "Shadow Stack",
+            "name": "shadow-stack",
             "bit": 6
           },
           {
             "type": "Flag",
-            "name": "PMU",
+            "name": "pmu",
             "bit": 7
           },
           {
             "type": "Flag",
-            "name": "Trap Intercept",
+            "name": "trap-intercept",
             "bit": 8
           }
         ],
         "edx": [
           {
             "type": "Flag",
-            "name": "MWAIT(Depricated)",
+            "name": "mwait-deprecated",
             "bit": 0
           },
           {
             "type": "Flag",
-            "name": "Debug",
+            "name": "debug",
             "bit": 1
           },
           {
             "type": "Flag",
-            "name": "PerfMon",
+            "name": "perfmon",
             "bit": 2
           },
           {
             "type": "Flag",
-            "name": "Physical partition events",
+            "name": "physical-partition-events",
             "bit": 3
           },
           {
             "type": "Flag",
-            "name": "Hypercall XMM",
+            "name": "hypercall-xmm",
             "bit": 4
           },
           {
             "type": "Flag",
-            "name": "Guest Idle",
+            "name": "guest-idle",
             "bit": 5
           },
           {
             "type": "Flag",
-            "name": "Hypervisor sleep",
+            "name": "hypervisor-sleep",
             "bit": 6
           },
           {
             "type": "Flag",
-            "name": "NUMA",
+            "name": "numa",
             "bit": 7
           },
           {
             "type": "Flag",
-            "name": "Timer Freq.",
+            "name": "timer-freq",
             "bit": 8
           },
           {
             "type": "Flag",
-            "name": "MCEInject",
+            "name": "mce-inject",
             "bit": 9
           },
           {
             "type": "Flag",
-            "name": "Crash MSR",
+            "name": "crash-msr",
             "bit": 10
           },
           {
             "type": "Flag",
-            "name": "Debug MSR",
+            "name": "debug-msr",
             "bit": 11
           },
           {
             "type": "Flag",
-            "name": "NPIEP",
+            "name": "npiep",
             "bit": 12
           },
           {
             "type": "Flag",
-            "name": "DisableHypervisorAvailable",
+            "name": "disable-hypervisor-available",
             "bit": 13
           },
           {
             "type": "Flag",
-            "name": "ExtendedGvaRangesForFlushVirtualAddressListAvailable",
+            "name": "extended-gva-ranges-for-flush-virtual-address-list-available",
             "bit": 14
           },
           {
             "type": "Flag",
-            "name": "Hypercall XMM Return",
+            "name": "hypercall-xmm-return",
             "bit": 15
           },
           {
             "type": "Flag",
-            "name": "SintPollingModeAvailable",
+            "name": "sint-polling-mode-available",
             "bit": 17
           },
           {
             "type": "Flag",
-            "name": "HypercallMsrLockAvailable",
+            "name": "hypercall-msr-lock-available",
             "bit": 18
           },
           {
             "type": "Flag",
-            "name": "Direct Synthetic Timers",
+            "name": "direct-synthetic-timers",
             "bit": 19
           },
           {
             "type": "Flag",
-            "name": "PAT VSM",
+            "name": "pat-vsm",
             "bit": 20
           },
           {
             "type": "Flag",
-            "name": "bindcfgs VSM",
+            "name": "bindcfgs-vsm",
             "bit": 21
           },
           {
             "type": "Flag",
-            "name": "Unhalted Timer",
+            "name": "unhalted-timer",
             "bit": 23
           },
           {
             "type": "Flag",
-            "name": "LBR",
+            "name": "lbr",
             "bit": 26
           }
         ]
       }
     },
     "0x40000005": {
-      "name": "Hypervisor Feature ID",
+      "name": "hypervisor-limits",
       "data_type": {
         "type": "BitField",
         "eax": [
           {
             "type": "Int",
-            "name": "Max Virtual Porcessors",
+            "name": "max-virtual-processors",
             "bounds": {
               "start": 0,
               "end": 31
@@ -490,7 +1865,7 @@
         "ebx": [
           {
             "type": "Int",
-            "name": "Max Logical Porcessors",
+            "name": "max-logical-processors",
             "bounds": {
               "start": 0,
               "end": 31
@@ -500,7 +1875,7 @@
         "ecx": [
           {
             "type": "Int",
-            "name": "Max Pysical Interrupt Vectors",
+            "name": "max-physical-interrupt-vectors",
             "bounds": {
               "start": 0,
               "end": 31
@@ -510,34 +1885,1046 @@
         "edx": []
       }
     },
+    "0x80000001": {
+      "name": "extended-features",
+      "data_type": {
+        "type": "BitField",
+        "eax": [],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "brand-id",
+            "bounds": {
+              "start": 0,
+              "end": 16
+            }
+          },
+          {
+            "type": "Int",
+            "name": "pkg-type",
+            "bounds": {
+              "start": 28,
+              "end": 32
+            }
+          }
+        ],
+        "ecx": [
+          {
+            "type": "Flag",
+            "name": "lahf-lm",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "cmp-legacy",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "svm",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "extapic",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "cr8legacy",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "abm",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "sse4a",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "misalignsse",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "3dnowprefetch",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "osvw",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "ibs",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "xop",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "skinit",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "wdt",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "lwp",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "fma4",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "tce",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "tbm",
+            "bit": 21
+          },
+          {
+            "type": "Flag",
+            "name": "topoext",
+            "bit": 22
+          },
+          {
+            "type": "Flag",
+            "name": "perfctr-core",
+            "bit": 23
+          },
+          {
+            "type": "Flag",
+            "name": "perfctr-nb",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "data-bkpt-ext",
+            "bit": 26
+          },
+          {
+            "type": "Flag",
+            "name": "perf-tsc",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "perfctr-llc",
+            "bit": 28
+          },
+          {
+            "type": "Flag",
+            "name": "monitorx",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "addr-mask-ext",
+            "bit": 30
+          }
+        ],
+        "edx": [
+          {
+            "type": "Flag",
+            "name": "fpu",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "vme",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "de",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "pse",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "tsc",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "msr",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "pae",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "mce",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "cx8",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "apic",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "syscall",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "mtrr",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "pge",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "mca",
+            "bit": 14
+          },
+          {
+            "type": "Flag",
+            "name": "cmov",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "pat",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "pse36",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "nx",
+            "bit": 20
+          },
+          {
+            "type": "Flag",
+            "name": "mmxext",
+            "bit": 22
+          },
+          {
+            "type": "Flag",
+            "name": "mmx",
+            "bit": 23
+          },
+          {
+            "type": "Flag",
+            "name": "fxsr",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "fxsr-opt",
+            "bit": 25
+          },
+          {
+            "type": "Flag",
+            "name": "pdpe1gb",
+            "bit": 26
+          },
+          {
+            "type": "Flag",
+            "name": "rdtscp",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "lm",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "3dnowext",
+            "bit": 30
+          },
+          {
+            "type": "Flag",
+            "name": "3dnow",
+            "bit": 31
+          }
+        ]
+      }
+    },
     "0x80000002": {
-      "name": "Brand String 1",
+      "name": "brand-string-1",
       "data_type": {
         "type": "String"
       }
     },
     "0x80000003": {
-      "name": "Brand String 2",
+      "name": "brand-string-2",
       "data_type": {
         "type": "String"
       }
     },
     "0x80000004": {
-      "name": "Brand String 3",
+      "name": "brand-string-3",
       "data_type": {
         "type": "String"
       }
     },
-    "0x80000008": {
-      "name": "Address Sizes and Extended Features",
+    "0x80000007": {
+      "name": "power-management-ras",
       "data_type": {
         "type": "BitField",
         "eax": [],
         "ebx": [
           {
             "type": "Flag",
-            "name": "WBNOINVD",
+            "name": "overflow-recov",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "succor",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "hwa",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "scalable-mca",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "mca-query-msr",
+            "bit": 15
+          }
+        ],
+        "ecx": [
+          {
+            "type": "Int",
+            "name": "cpu-pwr-sample-time-ratio",
+            "bounds": {
+              "start": 0,
+              "end": 32
+            }
+          }
+        ],
+        "edx": [
+          {
+            "type": "Flag",
+            "name": "ts",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "fid",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "vid",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "ttp",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "tm",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "100mhz-steps",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "hw-pstate",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "invtsc",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "cpb",
             "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "eff-freq-ro",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "proc-feedback-interface",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "proc-power-reporting",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "cppc-perf-priority",
+            "bit": 16
+          }
+        ]
+      }
+    },
+    "0x80000008": {
+      "name": "address-sizes-features",
+      "data_type": {
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Int",
+            "name": "phys-addr-size",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Int",
+            "name": "lin-addr-size",
+            "bounds": {
+              "start": 8,
+              "end": 16
+            }
+          },
+          {
+            "type": "Int",
+            "name": "guest-phys-addr-size",
+            "bounds": {
+              "start": 16,
+              "end": 24
+            }
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Flag",
+            "name": "clzero",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "inst-ret-cnt-msr",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "xsaveerptr",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "invlpgb",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "rdpru",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "be",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "mcommit",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "wbnoinvd",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "ibpb",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "int-wbinvd",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "ibrs",
+            "bit": 14
+          },
+          {
+            "type": "Flag",
+            "name": "amd-stibp",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "ibrs-always-on",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "stibp-always-on",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "ibrs-preferred",
+            "bit": 18
+          },
+          {
+            "type": "Flag",
+            "name": "ibrs-same-mode",
+            "bit": 19
+          },
+          {
+            "type": "Flag",
+            "name": "efer-lmsle-unsupported",
+            "bit": 20
+          },
+          {
+            "type": "Flag",
+            "name": "invlpgb-nested-pages",
+            "bit": 21
+          },
+          {
+            "type": "Flag",
+            "name": "amd-ssbd",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "virt-ssbd",
+            "bit": 25
+          },
+          {
+            "type": "Flag",
+            "name": "amd-no-ssb",
+            "bit": 26
+          },
+          {
+            "type": "Flag",
+            "name": "cppc",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "amd-psfd",
+            "bit": 28
+          },
+          {
+            "type": "Flag",
+            "name": "btc-no",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "ibpb-ret",
+            "bit": 30
+          }
+        ],
+        "ecx": [
+          {
+            "type": "Int",
+            "name": "nc",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          },
+          {
+            "type": "Int",
+            "name": "apic-id-size",
+            "bounds": {
+              "start": 12,
+              "end": 16
+            }
+          },
+          {
+            "type": "Int",
+            "name": "perf-tsc-size",
+            "bounds": {
+              "start": 16,
+              "end": 18
+            }
+          }
+        ],
+        "edx": [
+          {
+            "type": "Int",
+            "name": "invlpgb-count-max",
+            "bounds": {
+              "start": 0,
+              "end": 16
+            }
+          },
+          {
+            "type": "Int",
+            "name": "max-rdpru-id",
+            "bounds": {
+              "start": 16,
+              "end": 32
+            }
+          }
+        ]
+      }
+    },
+    "0x8000000a": {
+      "name": "svm-features",
+      "data_type": {
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Int",
+            "name": "svm-rev",
+            "bounds": {
+              "start": 0,
+              "end": 8
+            }
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "nasid",
+            "bounds": {
+              "start": 0,
+              "end": 32
+            }
+          }
+        ],
+        "ecx": [
+          {
+            "type": "Flag",
+            "name": "pml",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "enhanced-tlbi",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "x2avic-ext",
+            "bit": 6
+          }
+        ],
+        "edx": [
+          {
+            "type": "Flag",
+            "name": "npt",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "lbrv",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "svm-lock",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "nrip-save",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "tsc-scale",
+            "bit": 4
+          },
+          {
+            "type": "Flag",
+            "name": "vmcb-clean",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "flushbyasid",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "decodeassists",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "pmc-virt",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "pause-filter",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "pfthreshold",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "avic",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "v-vmsave-vmload",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "vgif",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "gmet",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "x2avic",
+            "bit": 18
+          },
+          {
+            "type": "Flag",
+            "name": "sss-check",
+            "bit": 19
+          },
+          {
+            "type": "Flag",
+            "name": "spec-ctrl",
+            "bit": 20
+          },
+          {
+            "type": "Flag",
+            "name": "rogpt",
+            "bit": 21
+          },
+          {
+            "type": "Flag",
+            "name": "host-mce-override",
+            "bit": 23
+          },
+          {
+            "type": "Flag",
+            "name": "tlbi-ctl",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "vnmi",
+            "bit": 25
+          },
+          {
+            "type": "Flag",
+            "name": "ibs-virt",
+            "bit": 26
+          },
+          {
+            "type": "Flag",
+            "name": "ext-lvt-avic-access-chg",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "svme-addr-chk",
+            "bit": 28
+          },
+          {
+            "type": "Flag",
+            "name": "bus-lock-threshold",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "idle-hlt-intercept",
+            "bit": 30
+          }
+        ]
+      }
+    },
+    "0x80000021": {
+      "name": "extended-features-2",
+      "data_type": {
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Flag",
+            "name": "no-nested-data-bp",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "fs-gs-base-ns",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "lfence-always-serializing",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "smm-pg-cfg-lock",
+            "bit": 3
+          },
+          {
+            "type": "Flag",
+            "name": "verw-clear",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "null-sel-clr-base",
+            "bit": 6
+          },
+          {
+            "type": "Flag",
+            "name": "upper-address-ignore",
+            "bit": 7
+          },
+          {
+            "type": "Flag",
+            "name": "auto-ibrs",
+            "bit": 8
+          },
+          {
+            "type": "Flag",
+            "name": "no-smm-ctl-msr",
+            "bit": 9
+          },
+          {
+            "type": "Flag",
+            "name": "fast-short-rep-stosb",
+            "bit": 10
+          },
+          {
+            "type": "Flag",
+            "name": "fast-short-repe-cmpsb",
+            "bit": 11
+          },
+          {
+            "type": "Flag",
+            "name": "precise-retire-pmc2",
+            "bit": 12
+          },
+          {
+            "type": "Flag",
+            "name": "prefetch-ctl-msr",
+            "bit": 13
+          },
+          {
+            "type": "Flag",
+            "name": "l2-tlb-size-x32",
+            "bit": 14
+          },
+          {
+            "type": "Flag",
+            "name": "amd-ermsb",
+            "bit": 15
+          },
+          {
+            "type": "Flag",
+            "name": "opcode-0f017-reclaim",
+            "bit": 16
+          },
+          {
+            "type": "Flag",
+            "name": "cpuid-user-dis",
+            "bit": 17
+          },
+          {
+            "type": "Flag",
+            "name": "epsf",
+            "bit": 18
+          },
+          {
+            "type": "Flag",
+            "name": "fast-rep-scasb",
+            "bit": 19
+          },
+          {
+            "type": "Flag",
+            "name": "prefetchi",
+            "bit": 20
+          },
+          {
+            "type": "Flag",
+            "name": "fp512-downgrade",
+            "bit": 21
+          },
+          {
+            "type": "Flag",
+            "name": "avx512-bmm",
+            "bit": 23
+          },
+          {
+            "type": "Flag",
+            "name": "eraps",
+            "bit": 24
+          },
+          {
+            "type": "Flag",
+            "name": "sbpb",
+            "bit": 27
+          },
+          {
+            "type": "Flag",
+            "name": "ibpb-brtype",
+            "bit": 28
+          },
+          {
+            "type": "Flag",
+            "name": "srso-no",
+            "bit": 29
+          },
+          {
+            "type": "Flag",
+            "name": "srso-user-kernel-no",
+            "bit": 30
+          },
+          {
+            "type": "Flag",
+            "name": "srso-msr-fix",
+            "bit": 31
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "microcode-patch-size",
+            "bounds": {
+              "start": 0,
+              "end": 16
+            }
+          },
+          {
+            "type": "Int",
+            "name": "rap-size",
+            "bounds": {
+              "start": 16,
+              "end": 24
+            }
+          }
+        ],
+        "ecx": [
+          {
+            "type": "Flag",
+            "name": "tsa-sq-no",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "tsa-l1-no",
+            "bit": 2
+          },
+          {
+            "type": "Flag",
+            "name": "verw-clear",
+            "bit": 5
+          },
+          {
+            "type": "Flag",
+            "name": "btb-ctx-isolation",
+            "bit": 8
+          }
+        ],
+        "edx": []
+      }
+    },
+    "0x80000022": {
+      "name": "extended-perfmon-debug",
+      "data_type": {
+        "type": "BitField",
+        "eax": [
+          {
+            "type": "Flag",
+            "name": "perfmon-v2",
+            "bit": 0
+          },
+          {
+            "type": "Flag",
+            "name": "lbr-stack",
+            "bit": 1
+          },
+          {
+            "type": "Flag",
+            "name": "lbr-and-pmc-freeze",
+            "bit": 2
+          }
+        ],
+        "ebx": [
+          {
+            "type": "Int",
+            "name": "num-perf-ctr-core",
+            "bounds": {
+              "start": 0,
+              "end": 4
+            }
+          },
+          {
+            "type": "Int",
+            "name": "lbr-stack-size",
+            "bounds": {
+              "start": 4,
+              "end": 10
+            }
+          },
+          {
+            "type": "Int",
+            "name": "num-perf-ctr-nb",
+            "bounds": {
+              "start": 10,
+              "end": 16
+            }
           }
         ],
         "ecx": [],
@@ -552,7 +2939,7 @@
       "fields": [
         {
           "type": "Int",
-          "name": "Platform_ID\"",
+          "name": "platform-id",
           "bounds": {
             "start": 50,
             "end": 52
@@ -566,7 +2953,7 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "SPLIT_LOCK_DISABLE_SUPPORTED",
+          "name": "split-lock-detect",
           "bit": 5
         }
       ]
@@ -577,58 +2964,168 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "RDCL_NO",
+          "name": "rdctl-no",
           "bit": 0
         },
         {
           "type": "Flag",
-          "name": "IBRS_ALL",
+          "name": "ibrs-all",
           "bit": 1
         },
         {
           "type": "Flag",
-          "name": "RSBA",
+          "name": "rsba",
           "bit": 2
         },
         {
           "type": "Flag",
-          "name": "SKIP_L1DF_VMENTRY",
+          "name": "skip-l1dfl-vmentry",
           "bit": 3
         },
         {
           "type": "Flag",
-          "name": "SSB_NO",
+          "name": "ssb-no",
           "bit": 4
         },
         {
           "type": "Flag",
-          "name": "MDS_NO",
+          "name": "mds-no",
           "bit": 5
         },
         {
           "type": "Flag",
-          "name": "IF_PSCHANGE_MC_NO",
+          "name": "pschange-mc-no",
           "bit": 6
         },
         {
           "type": "Flag",
-          "name": "TSX_CTRL",
+          "name": "tsx-ctrl",
           "bit": 7
         },
         {
           "type": "Flag",
-          "name": "TAA_NO",
+          "name": "taa-no",
           "bit": 8
         },
         {
           "type": "Flag",
-          "name": "GDS_CTRL",
+          "name": "mcu-control",
+          "bit": 9
+        },
+        {
+          "type": "Flag",
+          "name": "misc-package-ctls",
+          "bit": 10
+        },
+        {
+          "type": "Flag",
+          "name": "energy-filtering-ctl",
+          "bit": 11
+        },
+        {
+          "type": "Flag",
+          "name": "doitm",
+          "bit": 12
+        },
+        {
+          "type": "Flag",
+          "name": "sbdr-ssdp-no",
+          "bit": 13
+        },
+        {
+          "type": "Flag",
+          "name": "fbsdp-no",
+          "bit": 14
+        },
+        {
+          "type": "Flag",
+          "name": "psdp-no",
+          "bit": 15
+        },
+        {
+          "type": "Flag",
+          "name": "mcu-enumeration",
+          "bit": 16
+        },
+        {
+          "type": "Flag",
+          "name": "fb-clear",
+          "bit": 17
+        },
+        {
+          "type": "Flag",
+          "name": "fb-clear-ctrl",
+          "bit": 18
+        },
+        {
+          "type": "Flag",
+          "name": "rrsba",
+          "bit": 19
+        },
+        {
+          "type": "Flag",
+          "name": "bhi-no",
+          "bit": 20
+        },
+        {
+          "type": "Flag",
+          "name": "xapic-disable-status",
+          "bit": 21
+        },
+        {
+          "type": "Flag",
+          "name": "mcu-extended-service",
+          "bit": 22
+        },
+        {
+          "type": "Flag",
+          "name": "overclocking-status",
+          "bit": 23
+        },
+        {
+          "type": "Flag",
+          "name": "pbrsb-no",
+          "bit": 24
+        },
+        {
+          "type": "Flag",
+          "name": "gds-ctrl",
           "bit": 25
         },
         {
           "type": "Flag",
-          "name": "GDS_NO",
+          "name": "gds-no",
           "bit": 26
+        },
+        {
+          "type": "Flag",
+          "name": "rfds-no",
+          "bit": 27
+        },
+        {
+          "type": "Flag",
+          "name": "rfds-clear",
+          "bit": 28
+        },
+        {
+          "type": "Flag",
+          "name": "ign-umonitor-support",
+          "bit": 29
+        },
+        {
+          "type": "Flag",
+          "name": "mon-umon-mitg-support",
+          "bit": 30
+        },
+        {
+          "type": "Flag",
+          "name": "pbopt-support",
+          "bit": 32
+        },
+        {
+          "type": "Flag",
+          "name": "its-no",
+          "bit": 62
         }
       ]
     },
@@ -638,13 +3135,43 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "GDS_MITG_DIS",
+          "name": "rngds-mitg-dis",
+          "bit": 0
+        },
+        {
+          "type": "Flag",
+          "name": "rtm-allow",
+          "bit": 1
+        },
+        {
+          "type": "Flag",
+          "name": "rtm-locked",
+          "bit": 2
+        },
+        {
+          "type": "Flag",
+          "name": "fb-clear-dis",
+          "bit": 3
+        },
+        {
+          "type": "Flag",
+          "name": "gds-mitg-dis",
           "bit": 4
         },
         {
           "type": "Flag",
-          "name": "GDS_MITG_LOCK",
+          "name": "gds-mitg-lock",
           "bit": 5
+        },
+        {
+          "type": "Flag",
+          "name": "ign-umonitor",
+          "bit": 6
+        },
+        {
+          "type": "Flag",
+          "name": "mon-umon-mitg",
+          "bit": 7
         }
       ]
     },
@@ -654,7 +3181,7 @@
       "fields": [
         {
           "type": "Int",
-          "name": "LBR_FMT",
+          "name": "lbr-fmt",
           "bounds": {
             "start": 0,
             "end": 5
@@ -662,17 +3189,17 @@
         },
         {
           "type": "Flag",
-          "name": "PEBSTrap",
+          "name": "pebs-trap",
           "bit": 6
         },
         {
           "type": "Flag",
-          "name": "PEBSArchRegs",
+          "name": "pebs-arch-regs",
           "bit": 7
         },
         {
           "type": "Int",
-          "name": "PEBS_FMT",
+          "name": "pebs-fmt",
           "bounds": {
             "start": 8,
             "end": 11
@@ -680,27 +3207,27 @@
         },
         {
           "type": "Flag",
-          "name": "SMM_FREEZE",
+          "name": "smm-freeze",
           "bit": 12
         },
         {
           "type": "Flag",
-          "name": "FULL_WRITE",
+          "name": "full-width-write",
           "bit": 13
         },
         {
           "type": "Flag",
-          "name": "PEBS_BASELINE",
+          "name": "pebs-baseline",
           "bit": 14
         },
         {
           "type": "Flag",
-          "name": "METRICS_AVAIL",
+          "name": "metrics-avail",
           "bit": 15
         },
         {
           "type": "Flag",
-          "name": "PEBS_PT_AVAIL",
+          "name": "pebs-pt-avail",
           "bit": 16
         }
       ]
@@ -711,7 +3238,7 @@
       "fields": [
         {
           "type": "Int",
-          "name": "Revision",
+          "name": "vmcs-revision",
           "bounds": {
             "start": 0,
             "end": 30
@@ -719,7 +3246,7 @@
         },
         {
           "type": "Int",
-          "name": "VMXON size",
+          "name": "vmxon-size",
           "bounds": {
             "start": 32,
             "end": 44
@@ -727,13 +3254,41 @@
         },
         {
           "type": "Flag",
-          "name": "VMX controls",
+          "name": "vmx-32bit-phys-addr",
+          "bit": 48
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-dual-monitor",
+          "bit": 49
+        },
+        {
+          "type": "Int",
+          "name": "vmcs-memory-type",
+          "bounds": {
+            "start": 50,
+            "end": 54
+          }
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ins-outs",
+          "bit": 54
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-true-ctls",
           "bit": 55
         },
         {
           "type": "Flag",
-          "name": "Soft exceptions",
+          "name": "vmx-any-errcode",
           "bit": 56
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-nested-exception",
+          "bit": 58
         }
       ]
     },
@@ -743,27 +3298,27 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "Ext Int Exit",
+          "name": "vmx-intr-exit",
           "bit": 32
         },
         {
           "type": "Flag",
-          "name": "NMI Exits",
+          "name": "vmx-nmi-exit",
           "bit": 35
         },
         {
           "type": "Flag",
-          "name": "Virt NMI",
+          "name": "vmx-vnmi",
           "bit": 37
         },
         {
           "type": "Flag",
-          "name": "VMX Timer",
+          "name": "vmx-preemption-timer",
           "bit": 38
         },
         {
           "type": "Flag",
-          "name": "posted Int",
+          "name": "vmx-posted-intr",
           "bit": 39
         }
       ]
@@ -774,27 +3329,27 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "Ext Int Exit",
+          "name": "vmx-intr-exit",
           "bit": 32
         },
         {
           "type": "Flag",
-          "name": "NMI Exits",
+          "name": "vmx-nmi-exit",
           "bit": 35
         },
         {
           "type": "Flag",
-          "name": "Virt NMI",
+          "name": "vmx-vnmi",
           "bit": 37
         },
         {
           "type": "Flag",
-          "name": "VMX Timer",
+          "name": "vmx-preemption-timer",
           "bit": 38
         },
         {
           "type": "Flag",
-          "name": "posted Int",
+          "name": "vmx-posted-intr",
           "bit": 39
         }
       ]
@@ -805,112 +3360,112 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "Int Window Exit",
+          "name": "vmx-vintr-pending",
           "bit": 34
         },
         {
           "type": "Flag",
-          "name": "TSC Offsetting",
+          "name": "vmx-tsc-offset",
           "bit": 35
         },
         {
           "type": "Flag",
-          "name": "HLT exit",
+          "name": "vmx-hlt-exit",
           "bit": 39
         },
         {
           "type": "Flag",
-          "name": "INVLPG exit",
+          "name": "vmx-invlpg-exit",
           "bit": 41
         },
         {
           "type": "Flag",
-          "name": "MWAIT exit",
+          "name": "vmx-mwait-exit",
           "bit": 42
         },
         {
           "type": "Flag",
-          "name": "RDPMC exit",
+          "name": "vmx-rdpmc-exit",
           "bit": 43
         },
         {
           "type": "Flag",
-          "name": "RDTSC exit",
+          "name": "vmx-rdtsc-exit",
           "bit": 44
         },
         {
           "type": "Flag",
-          "name": "CR3-load exit",
+          "name": "vmx-cr3-load-exit",
           "bit": 47
         },
         {
           "type": "Flag",
-          "name": "CR3-store exit",
+          "name": "vmx-cr3-store-exit",
           "bit": 48
         },
         {
           "type": "Flag",
-          "name": "Ctls 3",
+          "name": "vmx-tertiary-ctls",
           "bit": 49
         },
         {
           "type": "Flag",
-          "name": "CR8-load exit",
+          "name": "vmx-cr8-load-exit",
           "bit": 51
         },
         {
           "type": "Flag",
-          "name": "CR8-store exit",
+          "name": "vmx-cr8-store-exit",
           "bit": 52
         },
         {
           "type": "Flag",
-          "name": "TPR Shadow",
+          "name": "vmx-flexpriority",
           "bit": 53
         },
         {
           "type": "Flag",
-          "name": "NMI exit",
+          "name": "vmx-vnmi-pending",
           "bit": 54
         },
         {
           "type": "Flag",
-          "name": "MOV-DR exit",
+          "name": "vmx-movdr-exit",
           "bit": 55
         },
         {
           "type": "Flag",
-          "name": "IO exit-all",
+          "name": "vmx-io-exit",
           "bit": 56
         },
         {
           "type": "Flag",
-          "name": "IO bitmap",
+          "name": "vmx-io-bitmap",
           "bit": 57
         },
         {
           "type": "Flag",
-          "name": "Monitor Trap",
+          "name": "vmx-mtf",
           "bit": 59
         },
         {
           "type": "Flag",
-          "name": "MSR bitmap",
+          "name": "vmx-msr-bitmap",
           "bit": 60
         },
         {
           "type": "Flag",
-          "name": "MONITOR exit",
+          "name": "vmx-monitor-exit",
           "bit": 61
         },
         {
           "type": "Flag",
-          "name": "PAUSE exit",
+          "name": "vmx-pause-exit",
           "bit": 62
         },
         {
           "type": "Flag",
-          "name": "Ctls 2",
+          "name": "vmx-secondary-ctls",
           "bit": 63
         }
       ]
@@ -921,112 +3476,112 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "Int Window Exit",
+          "name": "vmx-vintr-pending",
           "bit": 34
         },
         {
           "type": "Flag",
-          "name": "TSC Offsetting",
+          "name": "vmx-tsc-offset",
           "bit": 35
         },
         {
           "type": "Flag",
-          "name": "HLT exit",
+          "name": "vmx-hlt-exit",
           "bit": 39
         },
         {
           "type": "Flag",
-          "name": "INVLPG exit",
+          "name": "vmx-invlpg-exit",
           "bit": 41
         },
         {
           "type": "Flag",
-          "name": "MWAIT exit",
+          "name": "vmx-mwait-exit",
           "bit": 42
         },
         {
           "type": "Flag",
-          "name": "RDPMC exit",
+          "name": "vmx-rdpmc-exit",
           "bit": 43
         },
         {
           "type": "Flag",
-          "name": "RDTSC exit",
+          "name": "vmx-rdtsc-exit",
           "bit": 44
         },
         {
           "type": "Flag",
-          "name": "CR3-load exit",
+          "name": "vmx-cr3-load-exit",
           "bit": 47
         },
         {
           "type": "Flag",
-          "name": "CR3-store exit",
+          "name": "vmx-cr3-store-exit",
           "bit": 48
         },
         {
           "type": "Flag",
-          "name": "Ctls 3",
+          "name": "vmx-tertiary-ctls",
           "bit": 49
         },
         {
           "type": "Flag",
-          "name": "CR8-load exit",
+          "name": "vmx-cr8-load-exit",
           "bit": 51
         },
         {
           "type": "Flag",
-          "name": "CR8-store exit",
+          "name": "vmx-cr8-store-exit",
           "bit": 52
         },
         {
           "type": "Flag",
-          "name": "TPR Shadow",
+          "name": "vmx-flexpriority",
           "bit": 53
         },
         {
           "type": "Flag",
-          "name": "NMI exit",
+          "name": "vmx-vnmi-pending",
           "bit": 54
         },
         {
           "type": "Flag",
-          "name": "MOV-DR exit",
+          "name": "vmx-movdr-exit",
           "bit": 55
         },
         {
           "type": "Flag",
-          "name": "IO exit-all",
+          "name": "vmx-io-exit",
           "bit": 56
         },
         {
           "type": "Flag",
-          "name": "IO bitmap",
+          "name": "vmx-io-bitmap",
           "bit": 57
         },
         {
           "type": "Flag",
-          "name": "Monitor Trap",
+          "name": "vmx-mtf",
           "bit": 59
         },
         {
           "type": "Flag",
-          "name": "MSR bitmap",
+          "name": "vmx-msr-bitmap",
           "bit": 60
         },
         {
           "type": "Flag",
-          "name": "MONITOR exit",
+          "name": "vmx-monitor-exit",
           "bit": 61
         },
         {
           "type": "Flag",
-          "name": "PAUSE exit",
+          "name": "vmx-pause-exit",
           "bit": 62
         },
         {
           "type": "Flag",
-          "name": "Ctls 2",
+          "name": "vmx-secondary-ctls",
           "bit": 63
         }
       ]
@@ -1037,142 +3592,142 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "Virt APIC",
+          "name": "vmx-apicv-xapic",
           "bit": 32
         },
         {
           "type": "Flag",
-          "name": "Enable EPT",
+          "name": "vmx-ept",
           "bit": 33
         },
         {
           "type": "Flag",
-          "name": "Descriptor Table exit",
+          "name": "vmx-desc-exit",
           "bit": 34
         },
         {
           "type": "Flag",
-          "name": "Enable RDTSCP",
+          "name": "vmx-rdtscp-exit",
           "bit": 35
         },
         {
           "type": "Flag",
-          "name": "Virt x2APIC",
+          "name": "vmx-apicv-x2apic",
           "bit": 36
         },
         {
           "type": "Flag",
-          "name": "Enable VPID",
+          "name": "vmx-vpid",
           "bit": 37
         },
         {
           "type": "Flag",
-          "name": "WBINVD exit",
+          "name": "vmx-wbinvd-exit",
           "bit": 38
         },
         {
           "type": "Flag",
-          "name": "unrestricted",
+          "name": "vmx-unrestricted-guest",
           "bit": 39
         },
         {
           "type": "Flag",
-          "name": "Virt Apic",
+          "name": "vmx-apicv-register",
           "bit": 40
         },
         {
           "type": "Flag",
-          "name": "Virt Interrupts",
+          "name": "vmx-apicv-vid",
           "bit": 41
         },
         {
           "type": "Flag",
-          "name": "PAUSE loop exit",
+          "name": "vmx-ple",
           "bit": 42
         },
         {
           "type": "Flag",
-          "name": "RDRAND exit",
+          "name": "vmx-rdrand-exit",
           "bit": 43
         },
         {
           "type": "Flag",
-          "name": "Enable INVPCID",
+          "name": "vmx-invpcid-exit",
           "bit": 44
         },
         {
           "type": "Flag",
-          "name": "Enable VMFUNC",
+          "name": "vmx-vmfunc",
           "bit": 45
         },
         {
           "type": "Flag",
-          "name": "VMCS shadow",
+          "name": "vmx-shadow-vmcs",
           "bit": 46
         },
         {
           "type": "Flag",
-          "name": "ENCLS exit",
+          "name": "vmx-encls-exit",
           "bit": 47
         },
         {
           "type": "Flag",
-          "name": "RDSEED exit",
+          "name": "vmx-rdseed-exit",
           "bit": 48
         },
         {
           "type": "Flag",
-          "name": "Enable PML",
+          "name": "vmx-pml",
           "bit": 49
         },
         {
           "type": "Flag",
-          "name": "EPT exceptions",
+          "name": "vmx-ept-violation-ve",
           "bit": 50
         },
         {
           "type": "Flag",
-          "name": "VMX-PT conceal",
+          "name": "vmx-pt-conceal",
           "bit": 51
         },
         {
           "type": "Flag",
-          "name": "Enable XSAVE",
+          "name": "vmx-xsaves",
           "bit": 52
         },
         {
           "type": "Flag",
-          "name": "Mode EPT Ctrl",
+          "name": "vmx-mbec",
           "bit": 54
         },
         {
           "type": "Flag",
-          "name": "EPT Write Perm size",
+          "name": "vmx-spp",
           "bit": 55
         },
         {
           "type": "Flag",
-          "name": "PT - Guest Addr",
+          "name": "vmx-pt-guest-pa",
           "bit": 56
         },
         {
           "type": "Flag",
-          "name": "TSC scaling",
+          "name": "vmx-tsc-scaling",
           "bit": 57
         },
         {
           "type": "Flag",
-          "name": "User Wait",
+          "name": "vmx-enable-user-wait-pause",
           "bit": 58
         },
         {
           "type": "Flag",
-          "name": "Enable Pconfig",
+          "name": "vmx-pconfig",
           "bit": 59
         },
         {
           "type": "Flag",
-          "name": "ENCLV Exit",
+          "name": "vmx-enclv-exit",
           "bit": 60
         }
       ]
@@ -1183,23 +3738,621 @@
       "fields": [
         {
           "type": "Flag",
-          "name": "LOADIWKEY",
+          "name": "vmx-loadiwkey-exit",
           "bit": 0
         },
         {
           "type": "Flag",
-          "name": "Enable HLAT",
+          "name": "vmx-hlat",
           "bit": 1
         },
         {
           "type": "Flag",
-          "name": "EPT Write Ctrl",
+          "name": "vmx-ept-paging-write",
           "bit": 2
         },
         {
           "type": "Flag",
-          "name": "Guest Page Verify",
+          "name": "vmx-guest-paging-verify",
           "bit": 3
+        }
+      ]
+    },
+    {
+      "name": "VMX: Exit Ctls",
+      "address": "0x483",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-debugctl",
+          "bit": 34
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-host-addr-space-size",
+          "bit": 41
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-perf-global-ctrl",
+          "bit": 44
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-ack-intr",
+          "bit": 47
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-pat",
+          "bit": 50
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-pat",
+          "bit": 51
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-efer",
+          "bit": 52
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-efer",
+          "bit": 53
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-preemption-timer",
+          "bit": 54
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-bndcfgs",
+          "bit": 55
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-pt-conceal",
+          "bit": 56
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-rtit-ctl",
+          "bit": 57
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-lbr-ctl",
+          "bit": 58
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-uinv",
+          "bit": 59
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-cet",
+          "bit": 60
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-pkrs",
+          "bit": 61
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-perf-global-ctl",
+          "bit": 62
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-secondary-ctls",
+          "bit": 63
+        }
+      ]
+    },
+    {
+      "name": "VMX: True Exit Ctls",
+      "address": "0x48f",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-debugctl",
+          "bit": 34
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-host-addr-space-size",
+          "bit": 41
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-perf-global-ctrl",
+          "bit": 44
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-ack-intr",
+          "bit": 47
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-pat",
+          "bit": 50
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-pat",
+          "bit": 51
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-efer",
+          "bit": 52
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-efer",
+          "bit": 53
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-preemption-timer",
+          "bit": 54
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-bndcfgs",
+          "bit": 55
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-pt-conceal",
+          "bit": 56
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-rtit-ctl",
+          "bit": 57
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-lbr-ctl",
+          "bit": 58
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-clear-uinv",
+          "bit": 59
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-cet",
+          "bit": 60
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-pkrs",
+          "bit": 61
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-perf-global-ctl",
+          "bit": 62
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-secondary-ctls",
+          "bit": 63
+        }
+      ]
+    },
+    {
+      "name": "VMX: Exit Ctls 2",
+      "address": "0x493",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-exit-save-fred",
+          "bit": 0
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-fred",
+          "bit": 1
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-load-spec-ctrl",
+          "bit": 2
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-exit-prematurely-busy-shadow-stack",
+          "bit": 3
+        }
+      ]
+    },
+    {
+      "name": "VMX: Entry Ctls",
+      "address": "0x484",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-debugctl",
+          "bit": 34
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-ia32e-mode",
+          "bit": 41
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-smm",
+          "bit": 42
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-deactivate-dual-monitor",
+          "bit": 43
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-perf-global-ctrl",
+          "bit": 45
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-pat",
+          "bit": 46
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-efer",
+          "bit": 47
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-bndcfgs",
+          "bit": 48
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-pt-conceal",
+          "bit": 49
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-rtit-ctl",
+          "bit": 50
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-uinv",
+          "bit": 51
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-cet",
+          "bit": 52
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-lbr-ctl",
+          "bit": 53
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-pkrs",
+          "bit": 54
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-fred",
+          "bit": 55
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-spec-ctrl",
+          "bit": 56
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-allow-seam-guest-telemetry",
+          "bit": 57
+        }
+      ]
+    },
+    {
+      "name": "VMX: True Entry Ctls",
+      "address": "0x490",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-debugctl",
+          "bit": 34
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-ia32e-mode",
+          "bit": 41
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-smm",
+          "bit": 42
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-deactivate-dual-monitor",
+          "bit": 43
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-perf-global-ctrl",
+          "bit": 45
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-pat",
+          "bit": 46
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-efer",
+          "bit": 47
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-bndcfgs",
+          "bit": 48
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-pt-conceal",
+          "bit": 49
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-rtit-ctl",
+          "bit": 50
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-uinv",
+          "bit": 51
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-cet",
+          "bit": 52
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-lbr-ctl",
+          "bit": 53
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-pkrs",
+          "bit": 54
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-fred",
+          "bit": 55
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-load-spec-ctrl",
+          "bit": 56
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-entry-allow-seam-guest-telemetry",
+          "bit": 57
+        }
+      ]
+    },
+    {
+      "name": "VMX: Misc",
+      "address": "0x485",
+      "fields": [
+        {
+          "type": "Int",
+          "name": "preemption-timer-rate",
+          "bounds": {
+            "start": 0,
+            "end": 5
+          }
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-store-lma",
+          "bit": 5
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-activity-hlt",
+          "bit": 6
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-activity-shutdown",
+          "bit": 7
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-activity-wait-sipi",
+          "bit": 8
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-pt-in-vmx",
+          "bit": 14
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-smm-read-smbase",
+          "bit": 15
+        },
+        {
+          "type": "Int",
+          "name": "cr3-target-count",
+          "bounds": {
+            "start": 16,
+            "end": 25
+          }
+        },
+        {
+          "type": "Int",
+          "name": "max-msr-list-size",
+          "bounds": {
+            "start": 25,
+            "end": 28
+          }
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-smm-monitor-ctl-b2",
+          "bit": 28
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-vmwrite-vmexit-fields",
+          "bit": 29
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-zero-len-inject",
+          "bit": 30
+        },
+        {
+          "type": "Int",
+          "name": "mseg-revision",
+          "bounds": {
+            "start": 32,
+            "end": 64
+          }
+        }
+      ]
+    },
+    {
+      "name": "VMX: EPT and VPID Caps",
+      "address": "0x48c",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-ept-execonly",
+          "bit": 0
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-page-walk-4",
+          "bit": 6
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-page-walk-5",
+          "bit": 7
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ept-uc",
+          "bit": 8
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ept-wb",
+          "bit": 14
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ept-2mb",
+          "bit": 16
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ept-1gb",
+          "bit": 17
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invept",
+          "bit": 20
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-eptad",
+          "bit": 21
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ept-advanced-exitinfo",
+          "bit": 22
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-ept-supervisor-shadow-stack",
+          "bit": 23
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invept-single-context",
+          "bit": 25
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invept-all-context",
+          "bit": 26
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invvpid",
+          "bit": 32
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invvpid-single-addr",
+          "bit": 40
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invvpid-single-context",
+          "bit": 41
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invvpid-all-context",
+          "bit": 42
+        },
+        {
+          "type": "Flag",
+          "name": "vmx-invept-single-context-noglobals",
+          "bit": 43
+        },
+        {
+          "type": "Int",
+          "name": "hlat-prefix-size",
+          "bounds": {
+            "start": 48,
+            "end": 54
+          }
+        }
+      ]
+    },
+    {
+      "name": "VMX: VM Functions",
+      "address": "0x491",
+      "fields": [
+        {
+          "type": "Flag",
+          "name": "vmx-eptp-switching",
+          "bit": 0
         }
       ]
     }
